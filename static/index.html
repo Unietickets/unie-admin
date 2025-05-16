@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div id="login-form">
+            <h2 class="mb-4">Вход в админ-панель</h2>
+            <div id="login-error" class="alert alert-danger d-none"></div>
+            <form id="login">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Логин</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+        </div>
+        <div id="admin-panel" class="d-none">
+            <h2>Добро пожаловать в админ-панель</h2>
+            <p>Здесь будет управление пользователями.</p>
+        </div>
+    </div>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById("login").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorDiv = document.getElementById("login-error");
+
+            try {
+                const response = await fetch("/admin/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById("login-form").classList.add("d-none");
+                    document.getElementById("admin-panel").classList.remove("d-none");
+                } else {
+                    errorDiv.textContent = data.detail || "Ошибка входа";
+                    errorDiv.classList.remove("d-none");
+                }
+            } catch (err) {
+                errorDiv.textContent = "Ошибка сервера";
+                errorDiv.classList.remove("d-none");
+            }
+        });
+    </script>
+</body>
+</html>
