@@ -1,4 +1,6 @@
-fastapi
-uvicorn
-jinja2
-sqlalchemy
+boto3==1.38.21
+Flask==3.1.1
+flask_sqlalchemy==3.1.1
+python-dotenv==1.1.0
+SQLAlchemy==2.0.31
+Werkzeug==3.1.3
