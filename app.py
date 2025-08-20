@@ -1,13 +1,20 @@
+import math
 import os
+import shutil
 import uuid
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import boto3
-from flask import Flask, session, redirect, url_for, request, render_template, current_app
+from flask import Flask, session, redirect, url_for, request, render_template, current_app, flash
 from sqlalchemy import VARCHAR, TEXT, DECIMAL, UUID
+from itsdangerous import Serializer, BadSignature, SignatureExpired
+from flask_mail import Mail, Message
 from sqlalchemy.orm import aliased, joinedload
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from sqlalchemy.dialects.postgresql import ARRAY
+from werkzeug.utils import secure_filename
+
 load_dotenv()
 
 db_host = os.getenv("MYSQL_HOST")
@@ -22,6 +29,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 db = SQLAlchemy(app)
 
+app.config['SECRET_KEY'] = app.secret_key
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['SECURITY_PASSWORD_SALT'] = 'brhgvxncraffbceq'
+
+mail = Mail(app)
+
 s3 = boto3.client(
     "s3",
     aws_access_key_id="access-key",
@@ -29,6 +45,7 @@ s3 = boto3.client(
     region_name="region"
 )
 
+selling_fees = 50
 
 class User(db.Model):
     __tablename__ = 'User'
@@ -44,6 +61,7 @@ class User(db.Model):
     reset_token_exp = db.Column(db.DateTime, nullable=True)
     verification_code = db.Column(db.String, nullable=True)
     verification_code_exp = db.Column(db.DateTime, nullable=True)
+    node_id = db.Column(db.String(36), unique=True)
 
     transactions = db.relationship('Transaction', backref='user', cascade="all, delete")
     tickets = db.relationship('Ticket', backref='user', cascade="all, delete")
@@ -52,19 +70,30 @@ class User(db.Model):
     recommended_events = db.relationship('RecommendedEvent', backref='user', cascade="all, delete")
     user_balances = db.relationship('UserBalance', backref='user', cascade="all, delete")
 
+class Genre(db.Model):
+    __tablename__ = 'Genre'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(VARCHAR(255), nullable=False)
+
 
 class Event(db.Model):
     __tablename__ = 'Event'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(VARCHAR(255), nullable=False)
-    status = db.Column(db.Enum('coming', 'completed', 'cancelled', name='eventstatus'), default='coming')
-    genre = db.Column(VARCHAR(100), nullable=True)
+    status = db.Column(db.Enum('draft', 'upcoming', 'completed', 'cancelled', name='eventstatus'), default='draft')
+    genre = db.Column(ARRAY(db.String), default=[])
     tickets_available = db.Column(db.Integer, default=0)
     tickets_sold = db.Column(db.Integer, default=0)
     event_date = db.Column(db.DateTime, nullable=False)
+    event_date_end = db.Column(db.DateTime, nullable=False)
     location = db.Column(VARCHAR(255), nullable=True)
+    location_address = db.Column(VARCHAR(255), nullable=True)
+    city = db.Column(VARCHAR(255), nullable=True)
     description = db.Column(TEXT, nullable=True)
+    last_edit = db.Column(db.DateTime, nullable=False)
+    price_tickets = db.Column(DECIMAL(10, 2), nullable=False)
     photos = db.relationship('EventPhoto', backref='event', cascade="all, delete")
     tickets = db.relationship('Ticket', backref='event', cascade="all, delete")
     deals = db.relationship('Deal', backref='event', cascade="all, delete")
@@ -173,6 +202,17 @@ class UserAdmin(db.Model):
     password = db.Column(db.String(100))
     role = db.Column(db.String(100))
     user_hash = db.Column(db.String(100))
+    node_id = db.Column(
+        db.String(36),
+        db.ForeignKey('User.node_id', ondelete='CASCADE'),
+        nullable=False,
+        default=lambda: str(uuid.uuid4())
+    )
+    user = db.relationship(
+        'User',
+        backref=db.backref('user_admins', lazy=True),
+        primaryjoin="UserAdmin.node_id == User.node_id"
+    )
 
 
 @app.context_processor
@@ -214,16 +254,98 @@ def admin_login():
         email = request.form['email']
         password = request.form['password']
         user = UserAdmin.query.filter(UserAdmin.email == email).first()
-        if user and check_password_hash(user.password, password):
-            session['user_id'] = user.user_id
-            session['email_user'] = email
-            session['role'] = user.role
-            return redirect(url_for('stats'))
+        if user:
+            if check_password_hash(user.password, password):
+                session['user_id'] = user.user_id
+                session['node_id'] = user.user_id
+                session['email_user'] = email
+                session['role'] = user.role
+                return redirect(url_for('stats'))
+            return render_template('login.html', password_error=True)
         else:
-            return render_template('login.html')
+            return render_template('login.html', email_error=True)
     else:
         return render_template('login.html')
 
+def get_reset_password_token(user_email):
+    expires_in = 3600  # 1 hour
+    s = Serializer(current_app.config['SECRET_KEY'], str(expires_in))
+    return s.dumps({'email': user_email})
+
+def verify_reset_password_token(token):
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        data = s.loads(token, salt='reset-password')
+    except SignatureExpired:
+        # Token has expired
+        flash('The password reset link has expired. Please request a new one.')
+        return redirect(url_for('forgot_password'))
+    except BadSignature:
+        # Token is invalid
+        flash('The password reset link is invalid. Please request a new one.')
+        return redirect(url_for('forgot_password'))
+    return data.get('user_id')
+
+def confirm_reset_password_token(token):
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        data = s.loads(token)
+    except SignatureExpired:
+        # Signature expired. Token is no longer valid
+        return None
+    except BadSignature:
+        # Invalid signature. Token is invalid
+        return None
+    return data.get('email')
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if is_authenticated():
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        email = request.form['email']
+        user = UserAdmin.query.filter(UserAdmin.email == email).first()
+        if user:
+            token = get_reset_password_token(email)
+            # print("Tokeeeennn -    " + token)
+            msg = Message('Password Reset Request',
+                          sender='exchangebots@gmail.com',
+                          recipients=[email])
+            msg.body = f'''To reset your password, visit the following link:
+                {url_for('reset_password', token=token, _external=True)}
+
+                If you did not make this request then simply ignore this email and no changes will be made.
+                '''
+            mail.send(msg)
+            flash('An email has been sent with instructions to reset your password.', 'info')
+            return render_template('forgot_password.html', send_reset_password_url=True)
+        else:
+            return render_template('forgot_password.html', email_error = True)
+    return render_template('forgot_password.html')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if is_authenticated():
+        return redirect(url_for('index'))
+    user = verify_reset_password_token(token)
+    # print(user)
+    if not user:
+        flash('Invalid or expired token.', 'warning')
+        return redirect(url_for('forgot_password'))
+    if request.method == 'POST':
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            flash('Passwords do not match.', 'danger')
+        else:
+            email = token.split(': "')[1].split('"')[0]
+            user = UserAdmin.query.filter(UserAdmin.email == email).first()
+            # Hash the password
+            user.password = generate_password_hash(password)
+            db.session.commit()
+            flash('Your password has been updated.', 'success')
+            return redirect(url_for('admin_login'))
+    return render_template('reset_password.html', title='Reset Password', token=token)
 
 @app.route('/admin/stats')
 def stats():
@@ -292,62 +414,165 @@ def edit_tickets(ticket_id):
     else:
         return render_template('403.html')
 
-@app.route('/admin/event/edit/<int:event_id>', methods=['POST'])
-def edit_event(event_id):
+# @app.route('/admin/event/edit/<int:event_id>', methods=['POST'])
+# def edit_event(event_id):
+#     if is_authenticated():
+#         print(request.form)
+#         event = db.session.get(Event, event_id)
+#         event.name = request.form['name']
+#         event.genre = request.form['genre_id']
+#         event.event_date = request.form['event_date']
+#         event.event_date_end = request.form['event_end_date']
+#         event.location = request.form['location']
+#         event.location_address = request.form['location_address']
+#         event.city = request.form['city']
+#         event.tickets_available = request.form['ticket_quantity']
+#         event.description = request.form['description']
+#         db.session.commit()
+#
+#         # Получаем файлы
+#         photo_card = request.files.get('photo_card')
+#         photo_page = request.files.get('photo_page')
+#
+#         # Загружаем, если они действительно есть
+#         if photo_card and photo_card.filename:
+#             file_info = (
+#                 db.session.query(EventPhoto)
+#                 .filter(EventPhoto.location == 'card')
+#                 .filter(EventPhoto.event_id == event_id)
+#                 .first()
+#             )
+#             if file_info:
+#                 old_file = file_info.file_id
+#                 photo_card_id = upload_file(photo_card, 'media')
+#                 file_info.file_id = photo_card_id
+#                 db.session.commit()
+#                 delete_file('media', old_file)
+#             else:
+#                 photo_card_id = upload_file(photo_card, 'media')
+#                 db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
+#                 db.session.commit()
+#         if photo_page and photo_page.filename:
+#             file_info = (
+#                 db.session.query(EventPhoto)
+#                 .filter(EventPhoto.location == 'page')
+#                 .filter(EventPhoto.event_id == event_id)
+#                 .first()
+#             )
+#             if file_info:
+#                 old_file = file_info.file_id
+#                 photo_page_id = upload_file(photo_page, 'media')
+#                 file_info.file_id = photo_page_id
+#                 db.session.commit()
+#                 delete_file('media', old_file)
+#             else:
+#                 photo_page_id = upload_file(photo_page, 'media')
+#                 db.session.add(EventPhoto(event_id=event_id, file_id=photo_page_id, location='page'))
+#                 db.session.commit()
+#         return redirect(url_for('admin_events'))
+#     else:
+#         return render_template('403.html')
+
+def format_last_edit(ts):
+    now = datetime.now(ts.tzinfo) if ts.tzinfo else datetime.now()
+    date_str = ""
+    if ts.date() == now.date():
+        date_str = "today"
+    elif ts.date() == (now - timedelta(days=1)).date():
+        date_str = "yesterday"
+    else:
+        date_str = ts.strftime('%d %b %Y')
+    time_str = ts.strftime('%H:%M')
+    return f"Last edit {date_str} at {time_str}"
+
+@app.route('/admin/event/<int:event_id>', methods=['GET'])
+def info_event(event_id):
     if is_authenticated():
-        print(request.form)
-        event = db.session.get(Event, event_id)
-        event.name = request.form['name']
-        event.status = request.form['status']
-        event.genre = request.form['genre_id']
-        event.event_date = request.form['event_date']
-        event.location = request.form['location']
-        event.description = request.form['description']
-        db.session.commit()
-
-        # Получаем файлы
-        photo_card = request.files.get('photo_card')
-        photo_page = request.files.get('photo_page')
-
-        # Загружаем, если они действительно есть
-        if photo_card and photo_card.filename:
-            file_info = (
-                db.session.query(EventPhoto)
-                .filter(EventPhoto.location == 'card')
-                .filter(EventPhoto.event_id == event_id)
-                .first()
+        user_active = session['email_user']
+        photo_card = aliased(EventPhoto)
+        photo_page = aliased(EventPhoto)
+        file_card = aliased(File)
+        file_page = aliased(File)
+        base_query = (
+            db.session.query(Event)
+            .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+            .outerjoin(file_card, file_card.id == photo_card.file_id)
+            .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+            .outerjoin(file_page, file_page.id == photo_page.file_id)
+            .add_columns(
+                file_card.id.label("card_filename"),
+                file_page.id.label("page_filename"),
+                file_card.originalname.label("card_ext"),
+                file_page.originalname.label("page_ext")
             )
-            if file_info:
-                old_file = file_info.file_id
-                photo_card_id = upload_file(photo_card, 'media')
-                file_info.file_id = photo_card_id
-                db.session.commit()
-                delete_file('media', old_file)
-            else:
-                photo_card_id = upload_file(photo_card, 'media')
-                db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
-                db.session.commit()
-        if photo_page and photo_page.filename:
-            file_info = (
-                db.session.query(EventPhoto)
-                .filter(EventPhoto.location == 'page')
-                .filter(EventPhoto.event_id == event_id)
-                .first()
-            )
-            if file_info:
-                old_file = file_info.file_id
-                photo_page_id = upload_file(photo_page, 'media')
-                file_info.file_id = photo_page_id
-                db.session.commit()
-                delete_file('media', old_file)
-            else:
-                photo_page_id = upload_file(photo_page, 'media')
-                db.session.add(EventPhoto(event_id=event_id, file_id=photo_page_id, location='page'))
-                db.session.commit()
-        return redirect(url_for('admin_events'))
+            .filter(Event.id == event_id)
+        )
+        events = base_query.all()
+        events_info = []
+        for event_obj, card_filename, page_filename, card_ext, page_ext in events:
+            event_obj.card_filename = str(card_filename)
+            event_obj.page_filename = str(page_filename)
+            event_obj.card_ext = get_extension(card_ext)
+            event_obj.page_ext = get_extension(page_ext)
+            events_info.append(event_obj)
+        event = events_info[0]
+        genre_all = db.session.query(Genre).all()
+        date_format = (
+            f"{event.event_date.strftime('%A, %d %B %Y')}  {event.event_date.strftime('%H:%M')} - {event.event_date_end.strftime('%H:%M')}"
+        )
+        genre_all_list = []
+        for genre in genre_all:
+            genre_all_list.append(genre.name)
+        last_edit = format_last_edit(event.last_edit)
+        buyer_will_pay = round(float(event.price_tickets) + selling_fees)
+        return render_template('admin/event_info.html', event=event, date_format=date_format, genre_all_list=genre_all_list,last_edit=last_edit, selling_fees=selling_fees, buyer_will_pay=buyer_will_pay,user_active=user_active)
     else:
         return render_template('403.html')
 
+
+@app.route('/admin/genre/edit/<int:event_id>/<string:genre>/<string:action>', methods=['POST'])
+def edit_genre(event_id, genre, action):
+    if is_authenticated():
+        event = db.session.get(Event, event_id)
+        if not event:
+            flash('Event not found', 'error')
+            return redirect(url_for('info_event', event_id=event_id))
+        genres = event.genre or []
+        if action == "add":
+            if genre == "bulk":
+                data = request.get_json()
+                genres = [g for g in data.get('genres', [])]
+            else:
+                if genre not in genres:
+                    genres.append(genre)
+        elif action == "delete":
+            genres = [g for g in genres if g != genre]
+        else:
+            flash('Unknown action', 'error')
+            return redirect(url_for('info_event', event_id=event_id))
+        event.genre = genres
+        db.session.commit()
+        flash('Genre updated', 'success')
+        return redirect(url_for('info_event', event_id=event_id))
+    else:
+        return render_template('403.html')
+
+@app.route('/admin/event/edit/<int:event_id>', methods=['POST'])
+def edit_dates_event(event_id):
+    if is_authenticated():
+        user_active = session['email_user']
+        event = db.session.get(Event, event_id)
+        if not event:
+            flash('Event not found', 'error')
+            return redirect(url_for('info_event', event_id=event_id, user_active=user_active))
+        data = request.get_json()
+        event.event_date = data['start_date'] + ' ' + data['start_time']
+        event.event_date_end = data['end_date'] + ' ' + data['end_time']
+        db.session.commit()
+        flash('Dates updated', 'success')
+        return redirect(url_for('info_event', event_id=event_id, user_active=user_active))
+    else:
+        return render_template('403.html')
 
 @app.route('/admin/users/edit_status', methods=['GET'])
 def edit_status():
@@ -398,16 +623,15 @@ def create_user():
 def upload_file(file, bucket):
     UPLOAD_DIR = "static/uploads"
     os.makedirs(UPLOAD_DIR, exist_ok=True)
-    ext = os.path.splitext(file.filename)[1]
+    ext = os.path.splitext(file)[1]
     file_id = str(uuid.uuid4())
     local_filename = f"{file_id}{ext}"
     save_path = os.path.join(UPLOAD_DIR, local_filename)
-    file.save(save_path)
+    basename = os.path.basename(file)
+    shutil.move(file, save_path)
     filename_in_s3 = f"events/{file_id}"
     # Определение реального размера файла
-    file.stream.seek(0, 2)  # перейти в конец
-    size = file.stream.tell()
-    file.stream.seek(0)  # вернуть указатель в начало
+    size = os.path.getsize(save_path)
 
     # s3.upload_fileobj(
     #     Fileobj=file.stream,
@@ -421,7 +645,7 @@ def upload_file(file, bucket):
         id=file_id,
         bucket=bucket,
         filename=filename_in_s3,
-        originalname=file.filename,
+        originalname=basename,
         size=size
     )
     db.session.add(new_file)
@@ -452,31 +676,113 @@ def get_extension(filename):
     return ''
 
 
-@app.route('/admin/events/create', methods=['POST'])
+# @app.route('/admin/events/create', methods=['POST'])
+# def create_event():
+#     print(request.form)
+#     if is_authenticated():
+#         event = Event(name=request.form['name'], genre=request.form['genre_id'],
+#                       event_date=request.form['event_date'], location=request.form['location'],
+#                       description=request.form['description'],event_date_end=request.form['event_end_date'],location_address=request.form['location_address'],city=request.form['city'])
+#         db.session.add(event)
+#         db.session.commit()
+#         event_id = event.id
+#
+#         # Получаем файлы
+#         photo_card = request.files.get('photo_card')
+#         photo_page = request.files.get('photo_page')
+#
+#         # Загружаем, если они действительно есть
+#         if photo_card and photo_card.filename:
+#             photo_card_id = upload_file(photo_card, 'media')
+#             db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
+#
+#         if photo_page and photo_page.filename:
+#             photo_page_id = upload_file(photo_page, 'media')
+#             db.session.add(EventPhoto(event_id=event_id, file_id=photo_page_id, location='page'))
+#         db.session.commit()
+#         return redirect(url_for('admin_events'))
+#     return render_template('403.html')
+
+@app.route('/admin/events/cancel', methods=['GET', 'POST'])
+def cancel_event_creation():
+    image_filename = session.pop('temp_image', None)  # или другой ключ
+    session.pop('event_cover_path', None)
+    if image_filename:
+        path = os.path.join(app.root_path, 'static', 'tmp', image_filename)
+        if os.path.exists(path):
+            os.remove(path)
+    return redirect(url_for('admin_events'))
+
+@app.route('/admin/events/create', methods=['GET', 'POST'])
 def create_event():
-    if is_authenticated():
-        event = Event(name=request.form['name'], status=request.form['status'], genre=request.form['genre_id'],
-                      event_date=request.form['event_date'], location=request.form['location'],
-                      description=request.form['description'])
-        db.session.add(event)
-        db.session.commit()
-        event_id = event.id
+    if not is_authenticated():
+        return render_template('403.html')
+    UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'tmp')
+    user_active = session['email_user']
+    if request.method == 'POST':
+        if request.form.get('step') == 'step_1':
+            session['event_name'] = request.form.get('event_name')
+            session['event_desc'] = request.form.get('event_desc')
+            file = request.files['event_cover']
+            os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+            if file and file.filename:
+                file = request.files['event_cover']
+                filename = secure_filename(file.filename)
+                save_path = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(save_path)
+                session['temp_image'] = save_path
+                session['event_cover_path'] = filename
+            return render_template('admin/events_create_step_2.html', user_active=user_active)
+        elif request.form.get('step') == 'step_2':
+            session['start_date'] = request.form.get('start_date')
+            session['start_time'] = request.form.get('start_time')
+            session['end_date'] = request.form.get('end_date')
+            session['end_time'] = request.form.get('end_time')
+            session['venue_name'] = request.form.get('venue_name')
+            session['venue_city'] = request.form.get('venue_city')
+            session['venue_address'] = request.form.get('venue_address')
+            return render_template('admin/events_create_step_3.html', user_active=user_active)
+        elif request.form.get('step') == 'step_3':
+            try:
+                genres_str = request.form.get('genres', '')
+                available_quantity_tickets = request.form.get('available_quantity')
+                price = request.form.get('price')
+                last_updated = datetime.now()
+                genres_list = [g.strip() for g in genres_str.split(',') if g.strip()]
+                start_dt = f"{session['start_date']} {session['start_time']}"
+                end_dt = f"{session['end_date']} {session['end_time']}"
+                event = Event(name=session['event_name'], genre=genres_list,tickets_available=available_quantity_tickets,price_tickets=price,
+                              event_date=start_dt, location=session['venue_name'],
+                              description=session['event_desc'],event_date_end=end_dt,location_address=session['venue_address'],city=session['venue_city'],last_edit=last_updated)
+                db.session.add(event)
+                db.session.commit()
+                event_id = event.id
 
-        # Получаем файлы
-        photo_card = request.files.get('photo_card')
-        photo_page = request.files.get('photo_page')
 
-        # Загружаем, если они действительно есть
-        if photo_card and photo_card.filename:
-            photo_card_id = upload_file(photo_card, 'media')
-            db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
+                # photo_card = request.files.get('photo_card')
+                # photo_page = request.files.get('photo_page')
+                filename = session.get('event_cover_path')
+                #TODO Надо проработать фото
+                if filename:
+                    photo_card_id = upload_file(session['temp_image'], 'media')
+                    db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
+                    db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='page'))
+                db.session.commit()
+            except Exception as e:
+                print(e)
+                return render_template('admin/events_create_step_3.html', user_active=user_active, show_modal='error')
+            return render_template('admin/events_create_step_3.html', user_active=user_active, show_modal=True)
 
-        if photo_page and photo_page.filename:
-            photo_page_id = upload_file(photo_page, 'media')
-            db.session.add(EventPhoto(event_id=event_id, file_id=photo_page_id, location='page'))
-        db.session.commit()
-        return redirect(url_for('admin_events'))
-    return render_template('403.html')
+    filename = session.get('event_cover_path')
+    event_image_url = None
+    if filename:
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        if os.path.exists(file_path):
+            event_image_url = '/static/tmp/' + filename
+        else:
+            session.pop('event_cover_path')
+
+    return render_template('admin/events_create_step_1.html', event_image_url=event_image_url, user_active=user_active)
 
 
 @app.route('/admin/tickets/create', methods=['POST'])
@@ -502,41 +808,165 @@ def create_ticket():
         return redirect(url_for('admin_tickets'))
     return render_template('403.html')
 
+def attach_images_to_events(events):
+    # Получить все event_id из результатов поиска
+    event_ids = [e.id for e in events]
+    # Получить карточки-фотки одной пачкой
+    photo_card = aliased(EventPhoto)
+    photo_page = aliased(EventPhoto)
+    file_card = aliased(File)
+    file_page = aliased(File)
 
-@app.route('/admin/events', methods=['GET'])
+    photos = (
+        db.session.query(Event.id,
+                         file_card.id.label("card_filename"),
+                         file_page.id.label("page_filename"),
+                         file_card.originalname.label("card_ext"),
+                         file_page.originalname.label("page_ext"))
+        .join(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+        .join(file_card, file_card.id == photo_card.file_id)
+        .join(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+        .join(file_page, file_page.id == photo_page.file_id)
+        .filter(Event.id.in_(event_ids))
+        .all()
+    )
+    # Мапим по id
+    photos_by_id = {row.id: row for row in photos}
+    for event_obj in events:
+        photo = photos_by_id.get(event_obj.id)
+        if photo:
+            event_obj.card_filename = str(photo.card_filename)
+            event_obj.page_filename = str(photo.page_filename)
+            event_obj.card_ext = get_extension(photo.card_ext)
+            event_obj.page_ext = get_extension(photo.page_ext)
+        else:
+            event_obj.card_filename = event_obj.page_filename = None
+            event_obj.card_ext = event_obj.page_ext = None
+    return events
+
+@app.route('/admin/events', methods=['GET', 'POST'])
 def admin_events():
     if is_authenticated():
-        user_active = session['email_user']
-        photo_card = aliased(EventPhoto)
-        photo_page = aliased(EventPhoto)
-        file_card = aliased(File)
-        file_page = aliased(File)
+        if request.method == 'GET':
+            page = int(request.args.get('page', 1))
+            per_page = 8
+            user_active = session['email_user']
+            photo_card = aliased(EventPhoto)
+            photo_page = aliased(EventPhoto)
+            file_card = aliased(File)
+            file_page = aliased(File)
+            tab = request.args.get('tab', 'unpublished')
+            q = request.args.get('q', '').strip()
+            now = datetime.now()
+            base_query = db.session.query(Event)
+            if q:
+                search = f"%{q.lower()}%"
+                query = base_query.filter(
+                    db.or_(
+                        db.func.lower(Event.name).like(search),
+                        db.cast(Event.id, db.String).like(f"%{q}%")
+                    )
+                )
+                found = query.order_by(Event.event_date).all()
+                # определяем, к какому табу относятся найденные ивенты
+                if not found:
+                    found_tab = None
+                    events_info = []
+                else:
+                    # first event in found — определяем по дате и статусу в какой таб попадает
+                    event = found[0]
+                    if event.status == 'draft':
+                        found_tab = 'unpublished'
+                    elif event.event_date > now:
+                        found_tab = 'upcoming'
+                    else:
+                        found_tab = 'past'
+                    events_info = attach_images_to_events(found)
+                unpublished_count = base_query.filter(Event.status == 'draft').count()
+                # Пагинация вручную
+                total = len(events_info)  # <= Вот это total!
+                events_info = events_info[(page - 1) * per_page: page * per_page]  # Только текущая страница
+                total_pages = math.ceil(total / per_page)
+                return render_template('admin/events.html',
+                                       events_info=events_info,
+                                       current_tab=found_tab,
+                                       unpublished_count=unpublished_count,
+                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=user_active)
+            else:
+                # 1. Базовый запрос
+                base_query = (
+                    db.session.query(Event)
+                    .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+                    .outerjoin(file_card, file_card.id == photo_card.file_id)
+                    .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+                    .outerjoin(file_page, file_page.id == photo_page.file_id)
+                    .add_columns(
+                        file_card.id.label("card_filename"),
+                        file_page.id.label("page_filename"),
+                        file_card.originalname.label("card_ext"),
+                        file_page.originalname.label("page_ext")
+                    )
+                )
 
-        events = (
-            db.session.query(Event)
-            .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
-            .outerjoin(file_card, file_card.id == photo_card.file_id)
-            .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
-            .outerjoin(file_page, file_page.id == photo_page.file_id)
-            .order_by(Event.id)
-            .add_columns(
-                file_card.id.label("card_filename"),
-                file_page.id.label("page_filename"),
-                file_card.originalname.label("card_ext"),
-                file_page.originalname.label("page_ext")
-            )
-            .all()
-        )
-        events_info = []
-        for event_obj, card_filename, page_filename, card_ext, page_ext in events:
-            event_obj.card_filename = str(card_filename)
-            event_obj.page_filename = str(page_filename)
-            event_obj.card_ext = get_extension(card_ext)
-            event_obj.page_ext = get_extension(page_ext)
-            events_info.append(event_obj)
+                # 2. Фильтрация по табу
+                if tab == 'upcoming':
+                    base_query = base_query.filter(Event.event_date > now, Event.status != 'draft')
+                elif tab == 'past':
+                    base_query = base_query.filter(Event.event_date_end < now, Event.status != 'draft')
+                elif tab == 'unpublished':
+                    base_query = base_query.filter(Event.status == 'draft')
 
-        return render_template('admin/events.html', user_active=user_active, today=date.today().isoformat(),
-                               events_info=events_info)
+                # 3. Подсчет общего количества событий
+                total_events = base_query.count()
+                total_pages = (total_events + per_page - 1) // per_page
+
+                # 4. Пагинация
+                events = (
+                    base_query
+                    .order_by(Event.event_date)
+                    .limit(per_page)
+                    .offset((page - 1) * per_page)
+                    .all()
+                )
+
+                events_info = []
+                for event_obj, card_filename, page_filename, card_ext, page_ext in events:
+                    event_obj.card_filename = str(card_filename)
+                    event_obj.page_filename = str(page_filename)
+                    event_obj.card_ext = get_extension(card_ext)
+                    event_obj.page_ext = get_extension(page_ext)
+                    events_info.append(event_obj)
+
+                unpublished_count = db.session.query(Event).filter(Event.status == 'draft').count()
+
+                return render_template(
+                    'admin/events.html',
+                    user_active=user_active,
+                    today=(date.today() + timedelta(days=1)).isoformat(),
+                    events_info=events_info,
+                    current_tab=tab,
+                    unpublished_count=unpublished_count,
+                    page=page,
+                    total_pages=total_pages
+                )
+        else:
+            if request.form['action'] == 'add':
+                event = db.session.query(Event).filter_by(id=request.form['event_id']).first()
+                event.status = 'upcoming'
+                db.session.commit()
+                tab = request.args.get('tab', 'upcoming')
+                return redirect(url_for('admin_events', tab=tab))
+            elif request.form['action'] == 'delete':
+                event = db.session.get(Event, request.form['event_id'])
+                db.session.delete(event)
+                #TODO добавить удаление файлов
+                db.session.commit()
+                tab = request.args.get('tab', 'unpublished')
+                return redirect(url_for('admin_events', tab=tab))
+            else:
+                tab = request.args.get('tab', 'upcoming')
+                return redirect(url_for('admin_events', tab=tab))
+
     else:
         return render_template('403.html')
 
@@ -598,4 +1028,4 @@ def admin_tickets_request():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5050, debug=True)

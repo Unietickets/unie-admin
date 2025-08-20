@@ -9,566 +9,218 @@
     <!-- Подключение Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <style>
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -15px;
-            height: 100vh;
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-        }
-
-        .sidebar .profile {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .sidebar .avatar {
-        {
-            #background-color: #34495e;
-            #
-        } width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin: 0 auto;
-            line-height: 50px;
-            font-size: 24px;
-        }
-
-        .sidebar nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .sidebar nav ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar nav ul li a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .sidebar nav ul li a:hover {
-            background-color: #34495e;
-        }
-
-        /* Стили для основного контента */
-        .content {
-            margin-left: 270px; /* Отступ для сайдбара */
-            padding: 20px;
-        }
-
-        .table td, .table th {
-            vertical-align: middle;
-        }
-
-        .badge.bg-secondary {
-            background-color: #e7e7e7;
-            color: #fff;
-        }
-
-        .badge.bg-danger {
-            background-color: #e74c3c;
-            color: #fff;
-        }
-
-        .badge.bg-primary {
-            background-color: #3498db;
-            color: #fff;
-        }
-
-        .badge.bg-success {
-            background-color: #2ecc71;
-            color: #fff;
-        }
-
-        td, tr {
-            text-align: center;
-        }
-
-        .dropdown-menu {
-            background-color: #2c2c2c;
-            color: #fff;
-            border-radius: 5px;
-            padding: 10px;
-            min-width: 150px;
-        }
-
-        .dropdown-menu .dropdown-item {
-            color: #fff;
-        }
-
-        .dropdown-menu .dropdown-item:hover {
-            background-color: #444;
-        }
-
-        .dropdown-menu .dropdown-item i {
-            margin-right: 8px;
-        }
-
-        .dropdown-item.text-danger {
-            color: #e74c3c;
-        }
-
-        .dropdown-item.text-danger:hover {
-            color: #fff;
-        }
-
-        .flash-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 16px;
-            transition: all 0.5s ease;
-        }
-
-        .flash-message.error {
-            color: white;
-            background-color: red;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-        }
-
-        .flash-message.success {
-            color: white;
-            background-color: green;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
-        }
-
-        .flash-message.animated {
-            animation: flash-animation 1s ease-in-out infinite;
-        }
-
-        @keyframes flash-animation {
-            0% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.5;
-            }
-        }
-
-        .img-thumbnail {
-            width: 90px;
-            height: 50px;
-            object-fit: cover;
-        }
-    </style>
 </head>
 <body>
+    <div class="desktop-event-list">
+      {% include 'admin/sidebar.html' %}
+     <main class="frame-11">
+        <div class="frame-12">
+          <h2 class="text-wrapper-4">Events</h2>
+          <div class="component">
+           <nav class="frame-13 event-tabs" aria-label="Event filters">
+    <button class="menu-item-5 {% if current_tab == 'upcoming' %}active{% endif %}" data-tab="upcoming" onclick="location.href='?tab=upcoming'">
+        <span class="menu-item-6 tab-btn {% if current_tab == 'upcoming' %}active{% endif %}">Upcoming</span>
+    </button>
+    <button class="menu-item-5 {% if current_tab == 'past' %}active{% endif %}" data-tab="past" onclick="location.href='?tab=past'">
+        <span class="menu-item-6 tab-btn {% if current_tab == 'past' %}active{% endif %}">Past</span>
+    </button>
+    <svg width="2" height="20" viewBox="0 0 2 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<line x1="1" x2="1" y2="20" stroke="#DFDFDF" stroke-width="2"/>
+</svg>
 
-{% include 'admin/sidebar.html' %}
+    <button class="menu-item-7 {% if current_tab == 'unpublished' %}active{% endif %}" data-tab="unpublished" onclick="location.href='?tab=unpublished'">
+        <span class="menu-item-8 tab-btn {% if current_tab == 'unpublished' %}active{% endif %}">Unpublished</span>
+        <div class="alert" aria-label="0 unpublished events">
+            <span class="element">{{ unpublished_count }}</span>
+        </div>
+    </button>
+</nav>
 
-<!-- Основное содержимое страницы -->
-<div class="content">
-    <div class="container mt-4">
-        <h2 class="mb-4">
-            <i class="bi bi-people-fill"></i> Events
-        </h2>
-        <!-- Панель с кнопками -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="d-flex">
-                <input type="text" id="searchInput" class="form-control" placeholder="Поиск..." onkeyup="searchTable()">
-
+            <div class="frame-14">
+              <div class="frame-15">
+                <label for="search-event" class="visually-hidden" style="position: relative; display: inline-block;">Search event</label>
+                <div class="frame-16">
+                  <div class="div-2"><svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.2621 13.6464L12.1327 10.5176C13.0397 9.42871 13.492 8.03201 13.3955 6.6181C13.299 5.20419 12.661 3.88193 11.6144 2.92638C10.5678 1.97082 9.19312 1.45555 7.77629 1.48775C6.35945 1.51995 5.00957 2.09714 4.00746 3.09926C3.00535 4.10137 2.42815 5.45125 2.39595 6.86808C2.36375 8.28492 2.87903 9.65963 3.83458 10.7062C4.79013 11.7528 6.11239 12.3908 7.52631 12.4873C8.94022 12.5838 10.3369 12.1315 11.4258 11.2245L14.5546 14.3539C14.6011 14.4003 14.6562 14.4372 14.7169 14.4623C14.7776 14.4875 14.8427 14.5004 14.9083 14.5004C14.974 14.5004 15.0391 14.4875 15.0998 14.4623C15.1605 14.4372 15.2156 14.4003 15.2621 14.3539C15.3086 14.3074 15.3454 14.2523 15.3705 14.1916C15.3957 14.1309 15.4086 14.0658 15.4086 14.0001C15.4086 13.9344 15.3957 13.8694 15.3705 13.8087C15.3454 13.748 15.3086 13.6928 15.2621 13.6464ZM3.40835 7.00014C3.40835 6.11013 3.67227 5.2401 4.16673 4.50008C4.6612 3.76006 5.364 3.18328 6.18627 2.84268C7.00854 2.50209 7.91334 2.41298 8.78625 2.58661C9.65917 2.76024 10.461 3.18883 11.0903 3.81816C11.7197 4.4475 12.1482 5.24932 12.3219 6.12224C12.4955 6.99515 12.4064 7.89995 12.0658 8.72222C11.7252 9.54449 11.1484 10.2473 10.4084 10.7418C9.66839 11.2362 8.79836 11.5001 7.90835 11.5001C6.71528 11.4988 5.57145 11.0243 4.72783 10.1807C3.8842 9.33704 3.40967 8.19321 3.40835 7.00014Z" fill="#999999"/>
+                    </svg>
+                    </div>
+                    <input type="hidden" id="found_tab" value="{{ found_tab or '' }}">
+                  <input type="text" id="search-event" class="p" placeholder="Search event name / id" value="{% if q %}{{ q }}{% endif %}" />
+                    <button
+                        type="button"
+                        id="clear-search"
+                        style="
+                          position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+                          background: transparent; border: none; cursor: pointer; font-size: 18px; color: #999; display: none;{% if q %}{{ q }}{% endif %}
+                        "
+                        aria-label="Clear"
+                      >&times;</button>
+                </div>
+              </div>
+              <button class="button-2" onclick="location.href='events/create'"><span class="button-3">Create event</span></button>
             </div>
-
-            <div class="d-flex align-items-center">
-                {# <select style="margin-left: -50%" id="categorySelect" class="form-select me-2">#}
-                {#
-                <option value="">Все</option>
-                #}
-                {# {% for spec in unique_tags %}#}
-                {#
-                <option value="{{ spec }}">{{ spec }}</option>
-                #}
-                {# {% endfor %}#}
-                {# </select>#}
-                {#
-                <button class="btn btn-primary me-2"><i class="bi bi-upload"></i></button>
-                #}
-                {#
-                <button class="btn btn-primary me-2"><i class="bi bi-download"></i></button>
-                #}
-                <a class="btn btn-success" href="#"
-                   onclick="openCreateModal()">
-                    <i class="bi bi-plus"></i> Create event
-                </a>
+          </div>
+        </div>
+          {% if events_info|length == 0 %}
+        <div class="frame-17">
+          <div class="unie-interface-wrapper">
+            <svg width="101" height="100" viewBox="0 0 101 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.908203" width="100" height="100" rx="50" fill="#FAFAFA"/>
+            <g clip-path="url(#clip0_1806_8911)">
+            <path d="M36.7658 38.4277C36.0838 38.4277 35.4297 38.6987 34.9475 39.1809C34.4653 39.6631 34.1943 40.3172 34.1943 40.9992V64.142C34.1943 64.824 34.4653 65.4781 34.9475 65.9603C35.4297 66.4425 36.0838 66.7135 36.7658 66.7135H65.0515C65.7335 66.7135 66.3875 66.4425 66.8698 65.9603C67.352 65.4781 67.6229 64.824 67.6229 64.142V40.9992C67.6229 40.3172 67.352 39.6631 66.8698 39.1809C66.3875 38.6987 65.7335 38.4277 65.0515 38.4277H59.9086" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M41.9087 33.2852V43.5709" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M59.9087 33.2852V43.5709" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M41.9087 38.4277H54.7658" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M55.4613 57.1224L46.3584 48.0195" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M55.4613 48.0195L46.3584 57.1224" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_1806_8911">
+            <rect width="36" height="36" fill="white" transform="translate(32.9082 32)"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+          <div class="frame-18">
+            <p class="text-wrapper-5">No events to show.</p>
+            <button class="button-4" onclick="location.href='events/create'"><span class="button-3">Create event</span></button>
+          </div>
+        </div>
+         {% else %}
+         <div class="events-list" style="gap: 32px;">
+             <div class="cards-list">
+    {% for event in events_info %}
+                 <a href="/admin/event/{{ event.id }}" style="text-decoration:none; color:inherit;">
+    <div class="event-card event-card-border">
+        <!-- Верхний блок с картинкой и статусом -->
+        <div class="event-card-image" style="
+            width: 260px; height: 130px; border-radius: 8px 8px 0 0; position: relative;
+            background: url('{{ event_image_path(event.card_filename ~ '.' ~ event.card_ext) }}') center/cover no-repeat;">
+            {% if event.status == 'draft' %}
+            <div class="event-card-badge">
+                Unpublished
+            </div>
+            {% endif %}
+            <!-- опционально: три точки для меню -->
+            <div style="position: absolute; top: 12px; right: 14px; color: #fff;">&#8942;</div>
+        </div>
+        <!-- Основная информация -->
+        <div style="padding: 24px 16px 0 4px; margin-left: 7%;">
+            <div style="color: #676767; font-size: 14px; font-weight: 600;width: 215px;white-space: nowrap;overflow: hidden;
+    text-overflow: ellipsis;">
+                at {{ event.location }}, {{ event.city }}
+            </div>
+            <div style="font-size: 22px; font-weight: 700; margin: 10px 0 0 0;width: 215px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                {{ event.name }}
+            </div>
+            <div style="margin: 8px 0 0 0; color: #000; opacity: 0.8; font-size: 15px;">
+                {{ event.event_date.strftime('%A, %d %B %Y') }}
+                <br>
+                {{ event.event_date.strftime('%H:%M') }} - {{ event.event_date_end.strftime('%H:%M') }}
             </div>
         </div>
+        <!-- Нижний блок: количество и кнопка -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 10px 16px;">
+            <div style="color: #ababab; font-size: 14px; font-weight: 600;">
+                <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5015 10.0163C4.50058 9.91454 4.4595 9.81723 4.3872 9.74557C4.3149 9.67392 4.21722 9.63371 4.11542 9.63371C4.01363 9.63371 3.91595 9.67392 3.84364 9.74557C3.77134 9.81723 3.73026 9.91454 3.72934 10.0163V11.9541C3.72888 12.005 3.73853 12.0556 3.75773 12.1029C3.77693 12.1501 3.80529 12.1931 3.84119 12.2293C3.87708 12.2655 3.9198 12.2943 3.96687 12.3139C4.01394 12.3335 4.06443 12.3436 4.11542 12.3436C4.16642 12.3436 4.21691 12.3335 4.26398 12.3139C4.31104 12.2943 4.35376 12.2655 4.38966 12.2293C4.42555 12.1931 4.45392 12.1501 4.47311 12.1029C4.49231 12.0556 4.50196 12.005 4.5015 11.9541V10.0163ZM0.661438 6.42962H3.72934V8.39462C3.72888 8.44561 3.73853 8.49619 3.75773 8.54343C3.77693 8.59067 3.80529 8.63365 3.84119 8.66987C3.87708 8.70609 3.9198 8.73484 3.96687 8.75446C4.01394 8.77408 4.06443 8.78418 4.11542 8.78418C4.16642 8.78418 4.21691 8.77408 4.26398 8.75446C4.31104 8.73484 4.35376 8.70609 4.38966 8.66987C4.42555 8.63365 4.45392 8.59067 4.47311 8.54343C4.49231 8.49619 4.50196 8.44561 4.5015 8.39462V6.42962H15.3152C15.4904 6.4297 15.6584 6.49934 15.7823 6.62323C15.9061 6.74712 15.9758 6.91513 15.9758 7.09033V8.75771L15.8665 8.80215C15.4319 8.97836 15.0598 9.28025 14.7978 9.66919C14.5358 10.0581 14.3959 10.5164 14.3959 10.9853C14.3959 11.4543 14.5358 11.9126 14.7978 12.3015C15.0598 12.6904 15.4319 12.9923 15.8665 13.1686L15.9758 13.213V14.8802C15.9758 15.0554 15.9061 15.2234 15.7823 15.3473C15.6584 15.4713 15.4904 15.5409 15.3152 15.5411H4.5015V13.5758C4.50196 13.5248 4.49231 13.4742 4.47311 13.427C4.45392 13.3797 4.42555 13.3368 4.38966 13.3006C4.35376 13.2643 4.31104 13.2356 4.26398 13.216C4.21691 13.1963 4.16642 13.1862 4.11542 13.1862C4.06443 13.1862 4.01394 13.1963 3.96687 13.216C3.9198 13.2356 3.87708 13.2643 3.84119 13.3006C3.80529 13.3368 3.77693 13.3797 3.75773 13.427C3.73853 13.4742 3.72888 13.5248 3.72934 13.5758V15.541H0.660594C0.485411 15.5408 0.317464 15.4711 0.193614 15.3472C0.0697649 15.2233 0.000132332 15.0553 0 14.8801L0 13.2129L0.109375 13.1685C0.543319 12.9913 0.914807 12.6892 1.17663 12.3005C1.43845 11.9117 1.57878 11.4539 1.57978 10.9852C1.57873 10.5165 1.43839 10.0588 1.17657 9.67005C0.914752 9.28134 0.543287 8.97923 0.109375 8.80212L0 8.75765V7.09033C0.000122178 6.91557 0.0694309 6.74797 0.192774 6.62416C0.316117 6.50036 0.48346 6.43042 0.658219 6.42965L0.661438 6.42962ZM14.5975 1.49658C14.7626 1.43846 14.944 1.44802 15.1021 1.52318C15.2602 1.59834 15.3821 1.733 15.4412 1.89774L16 3.46846L15.9117 3.54702C15.6439 3.78717 15.4342 4.08507 15.2985 4.41819C15.1627 4.7513 15.1045 5.11093 15.1281 5.46987L15.1408 5.65737H2.89838L14.5975 1.49658Z" fill="#ABABAB"/>
+                </svg>
 
-        <!-- Таблица с клиентами -->
-        <table class="table table-hover" id="clientsTable">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Photo Card</th>
-                <th>Photo Page</th>
-                <th>Event Name</th>
-                <th>Event Date</th>
-                <th>Genre</th>
-                <th>Location</th>
-                <th>City</th>
-                <th>Description</th>
-                <th>Visible on Frontend</th>
-                <th>Tickets available</th>
-                <th>Tickets sold</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for event in events_info %}
-            <tr>
-                <td>{{ event.id }}</td>
-                <td>
-                    <img src="{{ event_image_path(event.card_filename ~ '.' ~ event.card_ext) }}" alt="{{ event.name }}"
-                         class="img-thumbnail" style="cursor:pointer"
-                         onclick="openImagePreview(this.src)">
-                </td>
-                <td>
-                    <img src="{{ event_image_path(event.page_filename ~ '.' ~ event.page_ext) }}" alt="{{ event.name }}"
-                         class="img-thumbnail" style="cursor:pointer"
-                         onclick="openImagePreview(this.src)">
-                </td>
-                <td>{{ event.name }}</td>
-                <td>{{ event.event_date }}</td>
-                <td>{{ event.genre }}</td>
-                <td>{{ event.location }}</td>
-                <td>City</td>
-                <td>{{ event.description }}</td>
-                <td>???</td>
-                <td>{{ event.tickets_available }}</td>
-                <td>{{ event.tickets_sold }}</td>
-                <td class="text-center align-middle">
-                  {% if event.status == 'coming' %}
-                    <span class="badge bg-info">Coming</span>
-                  {% elif event.status == 'completed' %}
-                    <span class="badge bg-success">Completed</span>
-                  {% elif event.status == 'cancelled' %}
-                    <span class="badge bg-danger">Cancelled</span>
-                  {% else %}
-                    <span class="badge bg-secondary">{{ event.status }}</span>
-                  {% endif %}
-                </td>
-                <td><a class="btn btn-info" href="#"
-                       onclick="openEditModal('{{ event.id }}', '{{ event.name }}', '{{ event.event_date }}' , '{{ event.genre }}', '{{ event.location }}', '{{ event.description }}', '{{ event.status }}')">
-                    <i class="bi bi-pencil"></i> Edit
-                </a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal for image preview -->
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <img id="previewImage" src="" alt="Preview" class="img-fluid">
             </div>
+            <span style="{% if current_tab == 'unpublished' %}margin-right: 34%{% elif current_tab == 'past' %}margin-right: 27%{% else %}margin-right: 68%{% endif %};
+                margin-top: 1%;color: #ababab; font-size: 14px; font-weight: 600;">Sold {{ event.tickets_sold }}/{{ event.tickets_available }}</span>
+            {% if event.status == 'draft' %}
+            <form action="/admin/events" method="POST">
+                <input hidden="hidden" name="event_id" value="{{ event.id }}">
+              <button type="submit" class="btn btn-primary"
+                      style="background: #6D4DFF; border: none; border-radius: 6px; font-weight: 600;">
+                Publish
+              </button>
+            </form>
+            {% elif event.status == 'completed' %}
+            <button class="btn btn-secondary" disabled style="border-radius: 6px;">Completed</button>
+            {% elif event.status == 'cancelled' %}
+            <button class="btn btn-danger" disabled style="border-radius: 6px;">Cancelled</button>
+            {% endif %}
         </div>
     </div>
+                     </a>
+    {% endfor %}
+                 {% for i in range(8 - events_info|length) %}
+    <div class="event-card event-card-border card-placeholder"></div>
+  {% endfor %}
+      </div>
+
 </div>
 
-<!-- Modal: Редактировать -->
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="editUserForm" method="POST" enctype="multipart/form-data">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit event</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="eventName" class="form-label">Event Name</label>
-                        <input type="text" class="form-control" id="EditEventName" name="name" required>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="eventDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="EditEventDescription" name="description" rows="4"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventDate" class="form-label">Event Date</label>
-                        <input type="date" class="form-control" id="EditEventDate" name="event_date"
-                               placeholder="DD.MM.YYYY" min="{{ today }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventLocation" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="EditEventLocation" name="location">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventCity" class="form-label">City</label>
-                        <input type="text" class="form-control" id="EditEventCity" name="city">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventPhotoPage" class="form-label">Photo for Event Page</label>
-                        <input type="file" class="form-control" id="EditEventPhotoPage" name="photo_page">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventPhotoCard" class="form-label">Photo for Event Card</label>
-                        <input type="file" class="form-control" id="EditEventPhotoCard" name="photo_card">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventStatus" class="form-label">Status</label>
-                        <select class="form-select" id="EditEventStatus" name="status">
-                            <option value="coming">Open</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventVisible" class="form-label">Visible on Frontend</label>
-                        <select class="form-select" id="EditEventVisible" name="visible">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventGenre" class="form-label">Genre</label>
-                        <select class="form-select" id="EditEventGenre" name="genre_id">
-                            <option value="1">1</option>
-                            <!-- Genres populated from database -->
-                            {# {% for genre in genres %}#}
-                            {#
-                            <option value="{{ genre.id }}">{{ genre.name }}</option>
-                            #}
-                            {# {% endfor %}#}
-                        </select>
-                    </div>
-                    <input type="hidden" id="editEventId" name="event_id">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                </div>
-            </div>
-        </form>
+          <div aria-label="Page navigation">
+  <ul class="pagination">
+    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+      <a class="page-link" href="?tab={{ current_tab }}&page={{ page - 1 }}{% if q %}&q={{ q }}{% endif %}">Previous</a>
+    </li>
+    {% for p in range(1, total_pages + 1) %}
+      <li class="page-item {% if page == p %}active{% endif %}">
+        <a class="page-link" href="?tab={{ current_tab }}&page={{ p }}{% if q %}&q={{ q }}{% endif %}">{{ p }}</a>
+      </li>
+    {% endfor %}
+    <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+      <a class="page-link" href="?tab={{ current_tab }}&page={{ page + 1 }}{% if q %}&q={{ q }}{% endif %}">Next</a>
+    </li>
+  </ul>
+</div>
+         {% endif %}
+      </main>
     </div>
-</div>
-<!-- Modal: Создать -->
-<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="createUserForm" method="POST" action="/admin/events/create" enctype="multipart/form-data">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Create new event</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="eventName" class="form-label">Event Name</label>
-                        <input type="text" class="form-control" id="eventName" name="name" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="eventDescription" name="description" rows="4"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventDate" class="form-label">Event Date</label>
-                        <input type="date" class="form-control" id="eventDate" name="event_date"
-                               placeholder="DD.MM.YYYY" min="{{ today }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventLocation" class="form-label">Location</label>
-                        <input type="text" class="form-control" id="eventLocation" name="location">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventCity" class="form-label">City</label>
-                        <input type="text" class="form-control" id="eventCity" name="city">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventPhotoPage" class="form-label">Photo for Event Page</label>
-                        <input type="file" class="form-control" id="eventPhotoPage" name="photo_page">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventPhotoCard" class="form-label">Photo for Event Card</label>
-                        <input type="file" class="form-control" id="eventPhotoCard" name="photo_card">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventStatus" class="form-label">Status</label>
-                        <select class="form-select" id="eventStatus" name="status">
-                            <option value="coming">Open</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventVisible" class="form-label">Visible on Frontend</label>
-                        <select class="form-select" id="eventVisible" name="visible">
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="eventGenre" class="form-label">Genre</label>
-                        <select class="form-select" id="eventGenre" name="genre_id">
-                            <option value="1">1</option>
-                            <!-- Genres populated from database -->
-                            {# {% for genre in genres %}#}
-                            {#
-                            <option value="{{ genre.id }}">{{ genre.name }}</option>
-                            #}
-                            {# {% endfor %}#}
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Подключение Bootstrap JS и Popper.js -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
+  </body>
 <script>
-    function openImagePreview(src) {
-        const previewImg = document.getElementById('previewImage');
-        previewImg.src = src;
-        const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-        modal.show();
-    }
-</script>
-<script>
-    function confirmBlock(event, url) {
-        if (confirm("Вы уверены, что хотите заблокировать этого пользователя?")) {
-            window.location.href = url;
-        } else {
-            event.preventDefault();
-        }
-    }
-
-    function searchTable() {
-        var input, filter, table, tr, td, i, j, txtValue;
-        input = document.getElementById("searchInput");
-        filter = input.value.toLowerCase();
-        table = document.getElementById("clientsTable");
-        tr = table.getElementsByTagName("tr");
-
-        for (i = 1; i < tr.length; i++) { // Начинаем с 1, чтобы пропустить заголовок
-            tr[i].style.display = "none"; // Сначала скрываем строку
-            td = tr[i].getElementsByTagName("td");
-            for (j = 0; j < td.length; j++) {
-                if (td[j]) {
-                    txtValue = td[j].textContent || td[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        tr[i].style.display = ""; // Показываем строку, если совпадает
-                        break; // Если найдено совпадение, выходим из внутреннего цикла
-                    }
-                }
-            }
-        }
-    }
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
-        var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-            return new bootstrap.Dropdown(dropdownToggleEl)
-        })
+document.querySelectorAll('.menu-item-5, .menu-item-7').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tab-btn').forEach(span => {
+      span.classList.remove('active');
     });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const categorySelect = document.getElementById('categorySelect');
+    const label = this.querySelector('.tab-btn');
+    if (label) label.classList.add('active');
+  });
+});
+const searchInput = document.getElementById('search-event');
 
-        function applyFilters() {
-            const rows = document.querySelectorAll('#clientsTable tbody tr');
-            const selectedCategory = categorySelect.value;
+searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        doSearch();
+    }
+});
 
-            rows.forEach(row => {
-                const category = row.cells[6].textContent;
-                const matchesCategory = !selectedCategory || category === selectedCategory;
+searchInput.addEventListener('blur', function() {
+    doSearch();
+});
 
-                row.style.display = matchesCategory ? '' : 'none';
-            });
+function doSearch() {
+    let q = searchInput.value;
+    let params = new URLSearchParams(window.location.search);
+    params.set('q', q);
+    params.set('page', 1);
+    window.location.search = params.toString();
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const clearBtn = document.getElementById('clear-search');
+    // показать кнопку, если есть текст (например, после поиска)
+    if (searchInput && clearBtn) {
+        if (searchInput.value) {
+            clearBtn.style.display = 'block';
         }
-
-        categorySelect.addEventListener('change', applyFilters);
-    });
-</script>
-<script>
-    function openEditModal(id, name, event_date, genre, location, description,status) {
-        document.getElementById('editEventId').value = id;
-        document.getElementById('EditEventName').value = name;
-        const onlyDate = event_date.split(" ")[0];
-        document.getElementById('EditEventDate').value = onlyDate;
-
-        // document.getElementById('EditEventGenre').value = name;
-        document.getElementById('EditEventLocation').value = location;
-        document.getElementById('EditEventDescription').value = description;
-document.getElementById('EditEventStatus').value = status;
-
-        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-        modal.show();
-
-        // Задать action формы, если надо:
-        document.getElementById('editUserForm').action = `/admin/event/edit/${id}`;
+        // по инпуту тоже управляем видимостью
+        searchInput.addEventListener('input', function() {
+            clearBtn.style.display = this.value ? 'block' : 'none';
+        });
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            // searchInput.focus();
+            window.location = '/admin/events?tab=unpublished'
+        });
     }
+});
 </script>
-<script>
-    function openCreateModal(id, name, email) {
-        document.getElementById('editUserId').value = id;
-        document.getElementById('editName').value = name;
-        document.getElementById('editEmail').value = email;
 
-
-        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-        modal.show();
-
-        // Задать action формы, если надо:
-        document.getElementById('editUserForm').action = `/admin/users/edit/${id}`;
-    }
-</script>
-<script>
-    function openCreateModal() {
-        // Очистим поля при открытии
-        document.getElementById('eventName').value = '';
-        document.getElementById('eventDescription').value = '';
-        document.getElementById('eventDate').value = '';
-        document.getElementById('eventLocation').value = '';
-        document.getElementById('eventCity').value = '';
-
-
-        const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
-        modal.show();
-    }
-</script>
-</body>
 </html>

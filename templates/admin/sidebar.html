@@ -1,127 +1,171 @@
-<style>
-      .sidebar {
-            position: fixed;
-            top: 0;
-            left: -15px;
-            height: 100vh;
-            width: 260px;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-          {#overflow-y: auto;#}
-        }
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
 
-        .sidebar .profile {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .sidebar .avatar {
-            {#background-color: #34495e;#}
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin: 0 auto;
-            line-height: 50px;
-            font-size: 24px;
-        }
-
-        .sidebar nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .sidebar nav ul li {
-            margin-bottom: 10px;
-        }
-
-        .sidebar nav ul li a {
-            color: white;
-            text-decoration: none;
-            display: block;
-            padding: 8px;
-            border-radius: 5px;
-        }
-
-        .sidebar nav ul li a:hover {
-            background-color: #34495e;
-        }
-          #logo {
-        width: 130px;
-    }
-    .notification-bell {
-    font-size: 16px;
-    position: relative;
-    cursor: pointer;
-}
-.notification-bell:hover {
-    background-color: #34495e;
-}
-.notification-count {
-    position: absolute;
-    top: -5px;
-    right: -10px;
-    background: red;
-    color: white;
-    padding: 2px 5px;
-    border-radius: 50%;
-    font-size: 12px;
-}
-
-.notification-list {
-    display: none;
-    position: absolute;
-    top: 225px;
-    left: 250px;
-    background: white;
-    padding: 10px;
-    width: 250px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-}
-</style>
-
-<div class="sidebar">
-        <div class="profile">
-            <div class="avatar" >
-            <img style="margin-top: -40%;
-    margin-left: -80%;" src="/static/images/logo.svg"
-                 id="logo" alt="Unietickets">
-        </div>
-            <p style="font-size: 17px;">{{ user_active }}<a href="#" onclick="confirmLogout(event)"><i style="font-size: 30px; color: white; margin-left: 20px" class="bi bi-box-arrow-right"></i></a></p>
-        </div>
-
-        <nav>
-            <ul>
-                <li><a href="/admin/stats"><i style="margin-right: 5%;" class="bi bi-graph-up"></i> Dashboard</a></li>
-               <li style="display: flex; align-items: center;">
-    <a href="/admin/users" style="flex-grow: 1; display: flex; align-items: center;">
-        <i style="margin-right: 8%;" class="bi bi-people-fill"></i> Users
-    </a>
-</li>
-<li><a href="/admin/events"><i style="margin-right: 5%;" class="bi bi-calendar-check"></i> Events</a></li>
-                <li><a href="/admin/tickets"><i style="margin-right: 5%;" class="bi bi-cash-coin"></i> Tickets</a></li>
-                <li><a href="/admin/tickets_request"><i style="margin-right: 5%;" class="bi bi-cash-coin"></i> Ticket requests</a></li>
-                <li><a href="/admin/deals"><i  style="margin-right: 5%;" class="bi bi-briefcase"></i> Deals</a></li>
-                <li><a href="/admin/review"><i style="margin-right: 5%;" class="bi bi-award-fill"></i> Отзывы</a></li>
-                <li><a href="/admin/audit"><i style="margin-right: 5%;" class="bi bi-card-text"></i> Аудит лог</a></li>
-                <li>
-                <a href="#settingsSubMenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                    <i class="bi bi-gear"></i> Настройки
+    <link rel="stylesheet" href="/static/css/globals.css" />
+    <link rel="stylesheet" href="/static/css/styleguide.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <title>UnieTicket - Events</title>
+  </head>
+  <body>
+    <div class="desktop-event-list">
+      <nav class="menu-item-sidebar">
+        <h1 class="text-wrapper-3">UnieTicket</h1>
+        <div class="frame">
+          <div class="div">
+            <ul class="frame-2">
+              <li class="menu-item {% if request.path.startswith('/admin/stats') %}div-wrapper{% endif %}">
+                <a href="/admin/stats" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/house.svg" alt="Home icon" />
+                      <span class="dashboard">Home</span>
+                    </div>
+                  </div>
                 </a>
-                <ul class="collapse list-unstyled" id="settingsSubMenu">
-                    <li style="margin-left: 10%;font-size: 14px"><a href="/admin/settings/general">Основные настройки</a></li>
-{#                    <li style="pointer-events: none; margin-left: 10%;font-size: 14px"><a href="/admin/settings/email">Email шаблоны</a></li>#}
-                    <li style="margin-left: 10%;font-size: 14px"><a href="/admin/settings/notifications">Уведомления</a></li>
-                </ul>
-            </li>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/events') %}div-wrapper{% endif %}">
+                <a href="/admin/events" class="frame-wrapper">
+                  <div class="frame-5">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/calendar-dots.svg" alt="Events icon" />
+                      <span class="text-wrapper">Events</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/orders') %}div-wrapper{% endif %}">
+                <a href="/admin/orders" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/shopping-cart-simple.svg" alt="Orders icon" />
+                      <span class="dashboard-2">Orders</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/attendees') %}div-wrapper{% endif %}">
+                <a href="/admin/attendees" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/users.svg" alt="Attendees icon" />
+                      <span class="dashboard-2">Attendees</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/finance') %}div-wrapper{% endif %}">
+                <a href="/admin/finance" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/wallet.svg" alt="Finance icon" />
+                      <span class="dashboard-2">Finance</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/support') %}div-wrapper{% endif %}">
+                <a href="/admin/support" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/chats.svg" alt="Support icon" />
+                      <span class="dashboard-2">Support</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item-2 {% if request.path.startswith('/admin/team') %}div-wrapper{% endif %}">
+                <a href="/admin/team" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/key.svg" alt="Team icon" />
+                      <span class="dashboard-2">Team</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item {% if request.path.startswith('/admin/qr_check_in') %}div-wrapper{% endif %}">
+                <a href="/admin/qr_check_in" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/qr-code.svg" alt="QR Check-in icon" />
+                      <span class="dashboard-2">QR Check-in</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
             </ul>
-        </nav>
+            <button class="button" aria-label="Create event" onclick="location.href='events/create'">
+              <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
+              <div class="frame-6"><span class="text-wrapper-2">Create event</span></div>
+            </button>
+          </div>
+          <div class="frame-7">
+            <ul>
+              <li class="menu-item-3 {% if request.path.startswith('/admin/help') %}div-wrapper{% endif %}">
+                <a href="/admin/help" class="frame-8">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/question.svg" alt="Help icon" />
+                      <span class="dashboard-2">Help</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="menu-item-3 {% if request.path.startswith('/admin/settings') %}div-wrapper{% endif %}">
+                <a href="/admin/settings" class="frame-8">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/gear-six.svg" alt="Settings icon" />
+                      <span class="dashboard-2">Settings</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+            <div class="menu-item-4">
+              <div class="frame-wrapper">
+                <div class="frame-9">
+                  <div class="frame-10">
+                    <div class="group">
+                      <div class="overlap-group">
+                        <img src="/static/images/sidebar/avatar_un.svg" alt="User avatar" />
+                      </div>
+                    </div>
+                    <span class="dashboard-3">{{ user_active }}</span>
+                  </div>
+                  <div class="div-2">
+                    <div class="overlap-group-wrapper">
+                      <div class="overlap-group-2" style="margin-left: 1%">
+                        <button
+							  type="button"
+							  style="
+								background: none;
+								border: none;
+								padding: 0;
+								margin: 0;
+								cursor: pointer;
+								outline: none;
+							  "
+							   onclick="confirmLogout(event)"
+							  aria-label="Назад"
+							>
+							  <img src="/static/images/sidebar/exit.svg" alt="Back" draggable="false" style="display: block;" />
+							</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
     </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
- <script>
+  </body>
+<script>
         function confirmLogout(e) {
             e.preventDefault(); // Отменяем стандартное поведение ссылки
             if (confirm('Выйти из учетной записи?')) {
@@ -129,4 +173,13 @@
                 window.location.href = '/admin/logout';
             }
         }
+        function selectMenuItem(el) {
+        // Снимаем класс со всех
+        document.querySelectorAll('.menu-item').forEach(item => {
+          item.classList.remove('div-wrapper');
+        });
+        // Добавляем выбранному
+        el.classList.add('div-wrapper');
+      }
     </script>
+</html>
