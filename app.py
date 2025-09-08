@@ -17,11 +17,13 @@ from werkzeug.utils import secure_filename
 
 load_dotenv()
 
-db_host = os.getenv("MYSQL_HOST")
-db_user = os.getenv("MYSQL_USER")
-db_password = os.getenv("MYSQL_PASSWORD")
-db_name = os.getenv("MYSQL_DB")
-db_port = os.getenv("MYSQL_PORT")
+db_host = os.getenv("DATABASE_HOST")
+db_user = os.getenv("DATABASE_USER")
+db_password = os.getenv("DATABASE_PASSWORD")
+db_name = os.getenv("DATABASE_NAME")
+db_port = os.getenv("DATABASE_PORT")
+
+print(db_host, db_user, db_password, db_name, db_port)
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
