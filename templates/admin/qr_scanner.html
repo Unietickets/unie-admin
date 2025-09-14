@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>QR Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- CDN библиотеки -->
+  <script src="https://unpkg.com/html5-qrcode" defer></script>
+  <style>
+    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:20px;}
+    #reader{width: 420px; max-width: 100%;}
+    .row{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start}
+    .card{border:1px solid #e5e5e5; border-radius:8px; padding:12px}
+    .muted{color:#666; font-size:14px}
+    .ok{color:#0a7f3f; font-weight:600}
+    .err{color:#a00; font-weight:600}
+    button{padding:8px 12px; border-radius:6px; border:1px solid #ddd; cursor:pointer}
+  </style>
+</head>
+<body>
+  <h1>QR-сканер</h1>
+  <div class="row">
+    <div class="card">
+      <!-- Виджет камеры + загрузка файлов -->
+      <div id="reader"></div>
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <button id="btn-start">Старт</button>
+        <button id="btn-stop">Стоп</button>
+      </div>
+    </div>
+
+    <div class="card" style="min-width:280px;">
+      <div><strong>Результат:</strong></div>
+      <pre id="result" style="white-space:pre-wrap;word-break:break-word;"></pre>
+      <div id="status" class="muted"></div>
+    </div>
+  </div>
+
+  <script>
+    let html5Qrcode;     // экземпляр сканера
+    let isRunning = false;
+
+    const resultEl = document.getElementById("result");
+    const statusEl = document.getElementById("status");
+    const btnStart = document.getElementById("btn-start");
+    const btnStop  = document.getElementById("btn-stop");
+
+    function onScanSuccess(decodedText, decodedResult) {
+      // показываем результат
+      resultEl.textContent = decodedText;
+
+      // (опционально) отправляем на сервер для проверки
+      fetch("/verify", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ text: decodedText })
+      })
+      .then(r => r.json())
+      .then(data => {
+        statusEl.textContent = data.ok ? "OK" : "Ошибка проверки";
+        statusEl.className = data.ok ? "ok" : "err";
+      })
+      .catch(() => {
+        statusEl.textContent = "Не удалось отправить на сервер";
+        statusEl.className = "err";
+      });
+
+      // Если нужно остановиться после первого скана:
+      // stopScanner();
+    }
+
+    function onScanFailure(error) {
+      // вызывается часто — не спамим лог
+    }
+
+    async function startScanner() {
+      if (isRunning) return;
+      if (!html5Qrcode) {
+        html5Qrcode = new Html5Qrcode("reader", /* verbose= */ false);
+      }
+      try {
+        // Попробуем выбрать заднюю камеру, где доступно
+        const devices = await Html5Qrcode.getCameras();
+        const backCam = devices.find(d => /back|rear|environment/i.test(d.label)) || devices[0];
+
+        await html5Qrcode.start(
+          backCam?.id || { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 280, height: 280 },
+            rememberLastUsedCamera: true
+          },
+          onScanSuccess,
+          onScanFailure
+        );
+        isRunning = true;
+        statusEl.textContent = "Сканер запущен";
+        statusEl.className = "muted";
+      } catch (e) {
+        statusEl.textContent = "Не удалось запустить камеру: " + e;
+        statusEl.className = "err";
+      }
+    }
+
+    async function stopScanner() {
+      if (html5Qrcode && isRunning) {
+        await html5Qrcode.stop();
+        await html5Qrcode.clear();
+        isRunning = false;
+        statusEl.textContent = "Сканер остановлен";
+        statusEl.className = "muted";
+      }
+    }
+
+    btnStart.addEventListener("click", startScanner);
+    btnStop .addEventListener("click", stopScanner);
+
+    // Автостарт на десктопе/мобиле по готовности скрипта
+    window.addEventListener("load", () => {
+      // Не автостартуем в iOS без пользовательского жеста, чтобы не ловить отказ
+      const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (!isiOS) startScanner();
+    });
+  </script>
+</body>
+</html>

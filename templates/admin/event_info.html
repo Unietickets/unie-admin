@@ -5,956 +5,1003 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events</title>
     <!-- Подключение Bootstrap CSS -->
-	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
     <!-- Подключение Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <style>
-	body {
-			font-family: system-ui;
-		}
-		.button {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			background: #1D076E;
-			border-radius: 6px;
-			border: none;
-			padding: 10px 16px;
-			margin-bottom: 10px;
-			text-align: left;
-		}
-		.button2 {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			background: none;
-			border-radius: 8px;
-			border: 2px solid #D4D2FF;
-			padding: 14px 17px;
-			text-align: left;
-		}
-		.button3 {
-			display: flex;
-flex-direction: row;
-justify-content: center;
-align-items: center;
-padding: 12px 16px;
-gap: 8px;
+    body {
+        font-family: system-ui;
+    }
 
-width: 88px;
-min-width: 60px;
-height: 46px;
+    .button {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #1D076E;
+        border-radius: 6px;
+        border: none;
+        padding: 10px 16px;
+        margin-bottom: 10px;
+        text-align: left;
+    }
 
-background: #6D4DFF;
-border-radius: 8px;
+    .button2 {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background: none;
+        border-radius: 8px;
+        border: 2px solid #D4D2FF;
+        padding: 14px 17px;
+        text-align: left;
+    }
 
-flex: none;
-order: 4;
-flex-grow: 0;
-		}
-		.button4 {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			background: #D4D2FF;
-			border-radius: 8px;
-			border: none;
-			padding: 11px 128px;
-			text-align: left;
-		}
-		.button-row-view {
-			flex-shrink: 0;
-			display: flex;
-			align-items: center;
-			background: none;
-			border-radius: 25px;
-			border: 1px solid #00000033;
-			padding: 6px 12px;
-			gap: 6px;
-			text-align: left;
-		}
-		.column {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			background: #1A0043;
-			padding: 25px 12px;
-		}
-		.column2 {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			margin-bottom: 91px;
-			gap: 24px;
-		}
-		.column3 {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
-		.column4 {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			background: #FFFFFF;
-			padding-top: 24px;
-			padding-bottom: 48px;
-			gap: 32px;
-		}
-		.column5 {
-			margin-bottom: auto;
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-		}
-		.column6 {
-			align-self: stretch;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			margin-top: 32px;
-			margin-bottom: 32px;
-			gap: 24px;
-		}
-		.column7 {
-			align-self: stretch;
-			display: flex;
-			flex-direction: column;
-		}
-		.column8 {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			background: #FFFFFF;
-			border-radius: 10px;
-			border: 2px solid #EFEFEF;
-		}
-		.column9 {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			padding-top: 16px;
-			padding-bottom: 16px;
-			gap: 16px;
-		}
-		.column10 {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			margin-left: 24px;
-			margin-right: 24px;
-			gap: 16px;
-		}
-		.column11 {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 8px;
-		}
-		.column12 {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding-bottom: 16px;
-			padding-left: 16px;
-			padding-right: 16px;
-			gap: 8px;
-		}
-		.column13 {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-		}
-		.contain {
-			display: flex;
-			flex-direction: column;
-			background: #FFFFFF;
-		}
-		.image {
-			width: 20px;
-			height: 20px;
-			object-fit: fill;
-		}
-		.image2 {
-			border-radius: 8px;
-			width: 18px;
-			height: 18px;
-			object-fit: fill;
-		}
-		.image3 {
-			width: 24px;
-			height: 24px;
-			object-fit: fill;
-		}
-		.image4 {
-			width: 16px;
-			height: 16px;
-			object-fit: fill;
-		}
-		.image5 {
-			width: 40px;
-			height: 42px;
-			object-fit: fill;
-		}
-		.image6 {
-			border-radius: 10px;
-			height: 269px;
-			align-self: stretch;
-			object-fit: fill;
-		}
-		.image7 {
-			border-radius: 25px;
-			width: 14px;
-			height: 14px;
-			object-fit: fill;
-		}
-		.image8 {
-			width: 30px;
-			height: 30px;
-			object-fit: fill;
-		}
-		.image9 {
-			width: 6px;
-			height: 6px;
-			margin-right: 12px;
-			object-fit: fill;
-		}
-		.row-view {
-			align-self: stretch;
-			display: flex;
-			align-items: flex-start;
-		}
-		.row-view2 {
-			display: flex;
-			align-items: center;
-			padding-top: 2px;
-			padding-bottom: 2px;
-			margin: 10px 16px 20px 16px;
-			gap: 12px;
-		}
-		.row-view3 {
-			display: flex;
-			align-items: center;
-			padding-top: 2px;
-			padding-bottom: 2px;
-			gap: 12px;
-		}
-		.row-view4 {
-			display: flex;
-			align-items: center;
-			padding-top: 2px;
-			padding-bottom: 2px;
-			margin: 10px 16px;
-			gap: 12px;
-		}
-		.row-view5 {
-			display: flex;
-			align-items: center;
-			background: #6D4DFF;
-			border-radius: 8px;
-			padding: 12px 46px;
-			gap: 7px;
-		}
-		.row-view6 {
-			display: flex;
-			align-items: center;
-			margin: 12px 16px;
-			gap: 12px;
-		}
-		.row-view7 {
-			display: flex;
-			align-items: center;
-			margin: 10px 16px;
-			gap: 50px;
-		}
-		.row-view8 {
-			flex-shrink: 0;
-			display: flex;
-			align-items: center;
-			padding-right: 2px;
-			gap: 10px;
-		}
-		.row-view9 {
-			align-self: stretch;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-left: 56px;
-			margin-right: 56px;
-		}
-		.row-view10 {
-			flex-shrink: 0;
-			display: flex;
-			align-items: center;
-			gap: 16px;
-		}
-		.row-view11 {
-			flex-shrink: 0;
-			display: flex;
-			align-items: flex-start;
-			gap: 12px;
-		}
-		.row-view12 {
-			align-self: stretch;
-			display: flex;
-			align-items: flex-start;
-			margin-left: 56px;
-			margin-right: 56px;
-			gap: 12px;
-		}
-		.row-view13 {
-			align-self: stretch;
-			display: flex;
-			align-items: flex-start;
-			gap: 4px;
-		}
-		.row-view14 {
-			align-self: stretch;
-			display: flex;
-			align-items: center;
-			margin-bottom: 16px;
-		}
-		.row-view15 {
-			display: flex;
-			align-items: flex-start;
-			gap: 16px;
-		}
-		.row-view16 {
-			display: flex;
-			align-items: center;
-			background: #F2F2FF;
-			border-radius: 8px;
-			padding: 16px;
-			gap: 24px;
-		}
-		.scroll-view {
-			height: 816px;
-			align-self: stretch;
-			background: #FFFFFF;
-		}
-		.text {
-			color: #F5F5F5;
-			font-size: 20px;
-			font-weight: bold;
-			margin-bottom: 29px;
-			margin-left: 16px;
-		}
-		.text2 {
-			color: #F2F2FF;
-			font-size: 14px;
-			font-weight: bold;
-		}
-		.text3 {
-			color: #F5F5F5;
-			font-size: 14px;
-			font-weight: bold;
-		}
-		.text4 {
-			color: #FFFFFF;
-			font-size: 14px;
-			font-weight: bold;
-		}
-		.text5 {
-			color: #FFFFFF;
-			font-size: 16px;
-			font-weight: bold;
-		}
-		.text_last {
-		width: 180px;
-		height: 24px;
-		font-family: 'Instrument Sans',serif;
-		font-style: normal;
-		font-weight: 500;
-		font-size: 14px;
-		line-height: 150%;
-		color: rgba(0, 0, 0, 0.4);
-		flex: none;
-		order: 0;
-		flex-grow: 0;
-		}
+    .button3 {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 8px;
 
-		.text6 {
-		width: 160px;
-		height: 24px;
-		font-family: 'Instrument Sans',serif;
-		font-style: normal;
-		font-weight: 500;
-		font-size: 14px;
-		line-height: 150%;
-		color: rgba(0, 0, 0, 0.4);
-		flex: none;
-		order: 0;
-		flex-grow: 0;
-		}
+        width: 88px;
+        min-width: 60px;
+        height: 46px;
 
-		.text6_rev {
-		width: 144px;
-		height: 24px;
-		font-family: 'Instrument Sans',serif;
-		font-style: normal;
-		font-weight: 500;
-		font-size: 14px;
-		line-height: 150%;
-		color: rgba(0, 0, 0, 0.4);
-		flex: none;
-		order: 0;
-		flex-grow: 0;
-		}
+        background: #6D4DFF;
+        border-radius: 8px;
 
-			.text_6 {
+        flex: none;
+        order: 4;
+        flex-grow: 0;
+    }
 
-		font-family: 'Instrument Sans',serif;
-		font-style: normal;
-		font-weight: 500;
-		font-size: 14px;
-		line-height: 150%;
-		flex: none;
-		order: 0;
-		flex-grow: 0;
-		}
-		.text7 {
-			color: #6D4DFF;
-			font-size: 16px;
-			font-weight: bold;
-		}
-		.text8 {
-			color: #000000;
-			font-size: 16px;
-			font-weight: bold;
-			margin-right: 14px;
-		}
-		.text9 {
-			color: #000000;
-			font-size: 16px;
-			font-weight: bold;
-		}
+    .button4 {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #D4D2FF;
+        border-radius: 8px;
+        border: none;
+        padding: 11px 128px;
+        text-align: left;
+    }
 
-		.text9_modal {
-			font-weight: bold;
-    		color: #6D4DFF;
-			font-size: 16px;
-			flex: 1;
-		}
-		.text10 {
-			color: #000000;
-			font-size: 32px;
-			font-weight: bold;
-			margin-bottom: 16px;
-		}
-		.text11 {
-			color: #000000;
-			font-size: 16px;
-			margin-bottom: 1px;
-		}
-		.text12 {
-			color: #000000;
-			font-size: 20px;
-			font-weight: bold;
-		}
-		.text13 {
-			color: #000000;
-			font-size: 20px;
-			font-weight: bold;
-			margin-left: 24px;
-		}
-		.text14 {
-			color: #000000;
-			font-size: 18px;
-			font-weight: bold;
-		}
-		.text15 {
-			color: #000000;
-			font-size: 14px;
-			font-weight: bold;
-			margin-bottom: 8px;
-		}
-		.text16 {
-			color: #000000;
-			font-size: 20px;
-			font-weight: bold;
-			margin-bottom: 1px;
-			margin-right: 82px;
-		}
-		.view {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
-		.view2 {
-			flex-shrink: 0;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			border-radius: 6px;
-		}
-.genre-input-wrapper {
-  position: relative;
-  width: 100%; /* или нужная ширина */
-  max-width: 1440px; /* по макету */
-}
+    .button-row-view {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        background: none;
+        border-radius: 25px;
+        border: 1px solid #00000033;
+        padding: 6px 12px;
+        gap: 6px;
+        text-align: left;
+    }
 
-.genre-input-row {
-	margin-top: 2%;
-    display: flex;
-    align-items: center;
-    gap: 0px;
-    flex-wrap: wrap;
-    background: #f3f3f3;
-    border-radius: 8px;
-    padding: 0px 12px;
-    min-height: 47px;
-    position: relative;
-}
+    .column {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        background: #1A0043;
+        padding: 25px 12px;
+    }
 
-.genre-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  flex: 1 1 0%;
-  min-width: 0;
-  align-items: center;
-}
-.genre-select-display {
-  font-family: 'Instrument Sans', serif;
-cursor: pointer;
-  font-size: 28px;
-  color: #252525;
-  user-select: none;
-  margin-left: 6px;
-  margin-right: 10px;
-}
-.genre-select-display .arrow {
-  margin-left: 10px;
-  font-size: 18px;
-}
-.genre-dropdown {
-  position: absolute;
-  left: 12px;
-  top: 100%;
-  z-index: 200;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 16px 2px #eee;
-  min-width: 180px;
-  width: max-content;
-  padding: 6px 0;
-  display: none;
-}
-.genre-dropdown.open {
-  display: block;
-}
+    .column2 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 91px;
+        gap: 24px;
+    }
 
-.genre-option:hover {
-  background: #f3f3f3;
-}
+    .column3 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-.tag {
-  display: inline-block;
-  background: #e5e7fa;
-  border-radius: 16px;
-  padding: 4px 10px;
-  margin: 2px;
-}
-.styled-checkbox {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  gap: 10px;
-  font-family: 'Instrument Sans', serif;
-  font-weight: 700;
-  font-size: 28px;
-  color: #5C4BD3;
-}
+    .column4 {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #FFFFFF;
+        padding-top: 24px;
+        padding-bottom: 48px;
+        gap: 32px;
+    }
 
-.styled-checkbox input {
-  display: none;
-}
+    .column5 {
+        margin-bottom: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-.styled-checkbox .checkmark {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  background: #fff;
-  border: 2px solid #5C4BD3;
-  position: relative;
-  display: inline-block;
-  transition: background 0.2s, border 0.2s;
-}
+    .column6 {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 32px;
+        margin-bottom: 32px;
+        gap: 24px;
+    }
 
-.styled-checkbox input:checked + .checkmark {
-  background: #5C4BD3;
-  border: 2px solid #5C4BD3;
-}
+    .column7 {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+    }
 
-/* Галочка появляется только при checked */
-.styled-checkbox .checkmark::after {
-  content: "";
-  display: none;
-  position: absolute;
-  left: 3px;
-    top: 1px;
- width: 6px;
-    height: 10px;
-  border: solid #fff;
-  border-width: 0 4px 4px 0;
-  border-radius: 2px;
-  transform: rotate(45deg) scale(0.8);
-}
+    .column8 {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #FFFFFF;
+        border-radius: 10px;
+        border: 2px solid #EFEFEF;
+    }
 
-.styled-checkbox input:checked + .checkmark::after {
-  display: block;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(38, 38, 38, 0.36);
-  z-index: 1001;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  background: #fff;
-  border-radius: 10px;
-  padding: 32px 48px 24px;
-  width: 455px;
-  min-height: 311px;
-  box-shadow: 0 8px 32px rgba(60, 60, 80, 0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  position: relative;
-}
-.modal-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-.modal-title {
-  font-family: 'Raleway', sans-serif;
-  font-weight: 700;
-  font-size: 29px;
-  line-height: 120%;
-  color: #252525;
-  margin-bottom: 0;
-  text-align: center;
-}
-.modal-desc {
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 16px;
-  color: #4F4F4F;
-  text-align: center;
-  line-height: 120%;
-}
-.modal-btn {
-  margin-top: 16px;
-  background: #6D4DFF;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-family: 'Instrument Sans', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 130%;
-  padding: 12px 32px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
+    .column9 {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        gap: 16px;
+    }
 
-.desktop-event-create {
-			display: flex;
-			  /*width: 1440px;*/
-			  height: 900px;
-			  align-items: center;
-			  position: relative;
-			  background-color: #ffffff;
-		}
+    .column10 {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 24px;
+        margin-right: 24px;
+        gap: 16px;
+    }
 
+    .column11 {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
 
+    .column12 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 16px;
+        padding-left: 16px;
+        padding-right: 16px;
+        gap: 8px;
+    }
 
-.modal_event {
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.18);
-  display: flex; align-items: center; justify-content: center;
-}
-.modal-content-event {
-  background: #fff;
-  border-radius: 10px;
-  padding: 32px 32px 24px 32px;
-  min-width: 600px;
-  position: relative;
-  box-shadow: 0 4px 40px rgba(0,0,0,0.13);
-}
-.close-event {
-  position: absolute; right: 24px; top: 22px; font-size: 28px; cursor: pointer;
-}
+    .column13 {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 
-/* Контейнер выбора */
-.genre-select-block {
-  width: 100%;
-  position: relative;
-  margin-bottom: 16px;
-}
+    .contain {
+        display: flex;
+        flex-direction: column;
+        background: #FFFFFF;
+    }
 
-/* Теги + input в одном ряду */
-.genre-tag-row, .genre-input-trigger {
-  display: flex; flex-wrap: wrap; align-items: center;
-  gap: 8px;
-  background: #f3f3f3;
-  border-radius: 8px;
-  padding: 14px 16px;
-  position: relative;
-  min-height: 47px;
-}
-.genre-tag-row {
-  flex: 1 1 auto;
-  gap: 8px 6px;
-}
-.genre-tag {
-  display: flex;
-  align-items: center;
-  padding: 6px 16px;
-  font-size: 15px;
-  border-radius: 25px;
-  border: 1px solid #ddd;
-  background: #fff;
-  margin-right: 0px;
-  font-family: 'Instrument Sans', Arial, sans-serif;
-}
-.genre-tag .tag-close {
-  margin-left: 8px;
-  font-size: 17px;
-  cursor: pointer;
-  color: #888;
-}
+    .image {
+        width: 20px;
+        height: 20px;
+        object-fit: fill;
+    }
 
-.genre-input-trigger {
+    .image2 {
+        border-radius: 8px;
+        width: 18px;
+        height: 18px;
+        object-fit: fill;
+    }
 
-  flex: 1 1 140px;
-  min-width: 140px;
-  border: none;
-  background: transparent;
-  align-items: center;
-  gap: 4px;
-}
+    .image3 {
+        width: 24px;
+        height: 24px;
+        object-fit: fill;
+    }
 
-#genre-search {
-	border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent;
+    .image4 {
+        width: 16px;
+        height: 16px;
+        object-fit: fill;
+    }
 
-}
-.search-row {
-  display: flex;
-  align-items: center;
-  background: #f3f3f3;
-  border-radius: 8px;
-  padding: 0 8px;
-  /* optionally add width or margin */
-}
+    .image5 {
+        width: 40px;
+        height: 42px;
+        object-fit: fill;
+    }
 
-.dropdown-icon {
-	display: none !important;
-  cursor: pointer;
-  font-size: 20px;
-  color: #222;
-  margin-left: 2px;
-  user-select: none;
-}
+    .image6 {
+        border-radius: 10px;
+        height: 269px;
+        align-self: stretch;
+        object-fit: fill;
+    }
 
-/* Выпадающий список жанров */
-.genre-options-list {
-  display: none;
-  position: absolute;
-  left: 0; right: 0;
-  top: calc(100% + 4px);
-  width: 100%;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
-  z-index: 100;
-  max-height: 220px;
-  overflow-y: auto;
-  transition: 0.15s;
-}
-.genre-options-list.open {
-  display: block;
-}
-.genre-option {
-	margin: 8px;
-  padding: 13px 24px;
-  cursor: pointer;
-  font-size: 16px;
-  color: #232323;
-  transition: background 0.15s;
-}
-.genre-option:hover, .genre-option.selected {
-  background: #F3F0FF;
-  color: black;
-}
+    .image7 {
+        border-radius: 25px;
+        width: 14px;
+        height: 14px;
+        object-fit: fill;
+    }
 
-.genre-option.disabled {
-	margin: 8px;
-  background: #F2F2FF;
-  color: black;
-}
+    .image8 {
+        width: 30px;
+        height: 30px;
+        object-fit: fill;
+    }
+
+    .image9 {
+        width: 6px;
+        height: 6px;
+        margin-right: 12px;
+        object-fit: fill;
+    }
+
+    .row-view {
+        align-self: stretch;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .row-view2 {
+        display: flex;
+        align-items: center;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin: 10px 16px 20px 16px;
+        gap: 12px;
+    }
+
+    .row-view3 {
+        display: flex;
+        align-items: center;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        gap: 12px;
+    }
+
+    .row-view4 {
+        display: flex;
+        align-items: center;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        margin: 10px 16px;
+        gap: 12px;
+    }
+
+    .row-view5 {
+        display: flex;
+        align-items: center;
+        background: #6D4DFF;
+        border-radius: 8px;
+        padding: 12px 46px;
+        gap: 7px;
+    }
+
+    .row-view6 {
+        display: flex;
+        align-items: center;
+        margin: 12px 16px;
+        gap: 12px;
+    }
+
+    .row-view7 {
+        display: flex;
+        align-items: center;
+        margin: 10px 16px;
+        gap: 50px;
+    }
+
+    .row-view8 {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        padding-right: 2px;
+        gap: 10px;
+    }
+
+    .row-view9 {
+        align-self: stretch;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-left: 56px;
+        margin-right: 56px;
+    }
+
+    .row-view10 {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .row-view11 {
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .row-view12 {
+        align-self: stretch;
+        display: flex;
+        align-items: flex-start;
+        margin-left: 56px;
+        margin-right: 56px;
+        gap: 12px;
+    }
+
+    .row-view13 {
+        align-self: stretch;
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .row-view14 {
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .row-view15 {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .row-view16 {
+        display: flex;
+        align-items: center;
+        background: #F2F2FF;
+        border-radius: 8px;
+        padding: 16px;
+        gap: 24px;
+    }
+
+    .scroll-view {
+        height: 816px;
+        align-self: stretch;
+        background: #FFFFFF;
+    }
+
+    .text {
+        color: #F5F5F5;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 29px;
+        margin-left: 16px;
+    }
+
+    .text2 {
+        color: #F2F2FF;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .text3 {
+        color: #F5F5F5;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .text4 {
+        color: #FFFFFF;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .text5 {
+        color: #FFFFFF;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .text_last {
+        width: 180px;
+        height: 24px;
+        font-family: 'Instrument Sans', serif;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        color: rgba(0, 0, 0, 0.4);
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+    }
+
+    .text6 {
+        width: 160px;
+        height: 24px;
+        font-family: 'Instrument Sans', serif;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        color: rgba(0, 0, 0, 0.4);
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+    }
+
+    .text6_rev {
+        width: 144px;
+        height: 24px;
+        font-family: 'Instrument Sans', serif;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        color: rgba(0, 0, 0, 0.4);
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+    }
+
+    .text_6 {
+
+        font-family: 'Instrument Sans', serif;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 150%;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+    }
+
+    .text7 {
+        color: #6D4DFF;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .text8 {
+        color: #000000;
+        font-size: 16px;
+        font-weight: bold;
+        margin-right: 14px;
+    }
+
+    .text9 {
+        color: #000000;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .text9_modal {
+        font-weight: bold;
+        color: #6D4DFF;
+        font-size: 16px;
+        flex: 1;
+    }
+
+    .text10 {
+        color: #000000;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 16px;
+    }
+
+    .text11 {
+        color: #000000;
+        font-size: 16px;
+        margin-bottom: 1px;
+    }
+
+    .text12 {
+        color: #000000;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .text13 {
+        color: #000000;
+        font-size: 20px;
+        font-weight: bold;
+        margin-left: 24px;
+    }
+
+    .text14 {
+        color: #000000;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .text15 {
+        color: #000000;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .text16 {
+        color: #000000;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 1px;
+        margin-right: 82px;
+    }
+
+    .view {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .view2 {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 6px;
+    }
+
+    .genre-input-wrapper {
+        position: relative;
+        width: 100%; /* или нужная ширина */
+        max-width: 1440px; /* по макету */
+    }
+
+    .genre-input-row {
+        margin-top: 2%;
+        display: flex;
+        align-items: center;
+        gap: 0px;
+        flex-wrap: wrap;
+        background: #f3f3f3;
+        border-radius: 8px;
+        padding: 0px 12px;
+        min-height: 47px;
+        position: relative;
+    }
+
+    .genre-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        flex: 1 1 0%;
+        min-width: 0;
+        align-items: center;
+    }
+
+    .genre-select-display {
+        font-family: 'Instrument Sans', serif;
+        cursor: pointer;
+        font-size: 28px;
+        color: #252525;
+        user-select: none;
+        margin-left: 6px;
+        margin-right: 10px;
+    }
+
+    .genre-select-display .arrow {
+        margin-left: 10px;
+        font-size: 18px;
+    }
+
+    .genre-dropdown {
+        position: absolute;
+        left: 12px;
+        top: 100%;
+        z-index: 200;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 16px 2px #eee;
+        min-width: 180px;
+        width: max-content;
+        padding: 6px 0;
+        display: none;
+    }
+
+    .genre-dropdown.open {
+        display: block;
+    }
+
+    .genre-option:hover {
+        background: #f3f3f3;
+    }
+
+    .tag {
+        display: inline-block;
+        background: #e5e7fa;
+        border-radius: 16px;
+        padding: 4px 10px;
+        margin: 2px;
+    }
+
+    .styled-checkbox {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        gap: 10px;
+        font-family: 'Instrument Sans', serif;
+        font-weight: 700;
+        font-size: 28px;
+        color: #5C4BD3;
+    }
+
+    .styled-checkbox input {
+        display: none;
+    }
+
+    .styled-checkbox .checkmark {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: #fff;
+        border: 2px solid #5C4BD3;
+        position: relative;
+        display: inline-block;
+        transition: background 0.2s, border 0.2s;
+    }
+
+    .styled-checkbox input:checked + .checkmark {
+        background: #5C4BD3;
+        border: 2px solid #5C4BD3;
+    }
+
+    /* Галочка появляется только при checked */
+    .styled-checkbox .checkmark::after {
+        content: "";
+        display: none;
+        position: absolute;
+        left: 3px;
+        top: 1px;
+        width: 6px;
+        height: 10px;
+        border: solid #fff;
+        border-width: 0 4px 4px 0;
+        border-radius: 2px;
+        transform: rotate(45deg) scale(0.8);
+    }
+
+    .styled-checkbox input:checked + .checkmark::after {
+        display: block;
+    }
 
 
-.btn {
-  min-width: 60px;
-  font-size: 16px;
-  border-radius: 8px;
-  padding: 8px 18px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  font-family: inherit;
-}
-.btn-outline {
-  border: 2px solid #D4D2FF;
-  color: #6D4DFF;
+    .desktop-event-create {
+        display: flex;
+        /*width: 1440px;*/
+        height: 900px;
+        align-items: center;
+        position: relative;
+        background-color: #ffffff;
+    }
 
-}
 
-.btn-outline:hover {
-	border-color: #dbcff4cc;
-    color: var(--bs-btn-hover-color);
-    background-color: var(--bs-btn-hover-bg);
-}
+    .modal_event {
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.btn-primary {
-  background: #6D4DFF;
-  color: #fff;
-}
-.date-col {
-  flex: 1 1 320px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-#toggle-search-btn {
-  margin-left: auto;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-#toggle-search-btn img {
+    .modal-content-event {
+        background: #fff;
+        border-radius: 10px;
+        padding: 32px 32px 24px 32px;
+        min-width: 600px;
+        position: relative;
+        box-shadow: 0 4px 40px rgba(0, 0, 0, 0.13);
+    }
 
-  filter: grayscale(1) opacity(0.7);
-  transition: filter 0.2s;
-}
-#toggle-search-btn:hover img {
-  filter: none;
-}
+    .close-event {
+        position: absolute;
+        right: 24px;
+        top: 22px;
+        font-size: 28px;
+        cursor: pointer;
+    }
 
-/* Chrome, Safari, Edge */
-input[type="time"]::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    display: none;
-    /* иногда достаточно opacity: 0; */
-}
+    /* Контейнер выбора */
+    .genre-select-block {
+        width: 100%;
+        position: relative;
+        margin-bottom: 16px;
+    }
 
-/* Firefox */
-input[type="time"]::-moz-calendar-picker-indicator {
-    opacity: 0;
-    display: none;
-}
+    /* Теги + input в одном ряду */
+    .genre-tag-row, .genre-input-trigger {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        background: #f3f3f3;
+        border-radius: 8px;
+        padding: 14px 16px;
+        position: relative;
+        min-height: 47px;
+    }
 
-/* Edge (старый) */
-input[type="time"]::-ms-clear,
-input[type="time"]::-ms-expand {
-    display: none;
-}
-/* Chrome, Safari, Edge */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    opacity: 0;
-    display: none;
-    /* иногда достаточно opacity: 0; */
-}
+    .genre-tag-row {
+        flex: 1 1 auto;
+        gap: 8px 6px;
+    }
 
-/* Firefox */
-input[type="date"]::-moz-calendar-picker-indicator {
-    opacity: 0;
-    display: none;
-}
+    .genre-tag {
+        display: flex;
+        align-items: center;
+        padding: 6px 16px;
+        font-size: 15px;
+        border-radius: 25px;
+        border: 1px solid #ddd;
+        background: #fff;
+        margin-right: 0px;
+        font-family: 'Instrument Sans', Arial, sans-serif;
+    }
 
-/* Edge (старый) */
-input[type="date"]::-ms-clear,
-input[type="date"]::-ms-expand {
-    display: none;
-}
+    .genre-tag .tag-close {
+        margin-left: 8px;
+        font-size: 17px;
+        cursor: pointer;
+        color: #888;
+    }
 
-input[type="date"] {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none;
-}
-input[type="date"]:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none;
-}
-input[type="time"] {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none;
-}
-input[type="time"]:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none;
-}
-	</style>
+    .genre-input-trigger {
+
+        flex: 1 1 140px;
+        min-width: 140px;
+        border: none;
+        background: transparent;
+        align-items: center;
+        gap: 4px;
+    }
+
+    #genre-search {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background: transparent;
+
+    }
+
+    .search-row {
+        display: flex;
+        align-items: center;
+        background: #f3f3f3;
+        border-radius: 8px;
+        padding: 0 8px;
+        /* optionally add width or margin */
+    }
+
+    .dropdown-icon {
+        display: none !important;
+        cursor: pointer;
+        font-size: 20px;
+        color: #222;
+        margin-left: 2px;
+        user-select: none;
+    }
+
+    /* Выпадающий список жанров */
+    .genre-options-list {
+        display: none;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 4px);
+        width: 100%;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+        z-index: 100;
+        max-height: 220px;
+        overflow-y: auto;
+        transition: 0.15s;
+    }
+
+    .genre-options-list.open {
+        display: block;
+    }
+
+    .genre-option {
+        margin: 8px;
+        padding: 13px 24px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #232323;
+        transition: background 0.15s;
+    }
+
+    .genre-option:hover, .genre-option.selected {
+        background: #F3F0FF;
+        color: black;
+    }
+
+    .genre-option.disabled {
+        margin: 8px;
+        background: #F2F2FF;
+        color: black;
+    }
+
+
+    .btn {
+        min-width: 60px;
+        font-size: 16px;
+        border-radius: 8px;
+        padding: 8px 18px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        font-family: inherit;
+    }
+
+    .btn-outline {
+        border: 2px solid #D4D2FF;
+        color: #6D4DFF;
+
+    }
+
+    .btn-outline:hover {
+        border-color: #dbcff4cc;
+        color: var(--bs-btn-hover-color);
+        background-color: var(--bs-btn-hover-bg);
+    }
+
+    .btn-primary {
+        background: #6D4DFF;
+        color: #fff;
+    }
+
+    .date-col {
+        flex: 1 1 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #toggle-search-btn {
+        margin-left: auto;
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    #toggle-search-btn img {
+
+        filter: grayscale(1) opacity(0.7);
+        transition: filter 0.2s;
+    }
+
+    #toggle-search-btn:hover img {
+        filter: none;
+    }
+
+    /* Chrome, Safari, Edge */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+        /* иногда достаточно opacity: 0; */
+    }
+
+    /* Firefox */
+    input[type="time"]::-moz-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+    }
+
+    /* Edge (старый) */
+    input[type="time"]::-ms-clear,
+    input[type="time"]::-ms-expand {
+        display: none;
+    }
+
+    /* Chrome, Safari, Edge */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+        /* иногда достаточно opacity: 0; */
+    }
+
+    /* Firefox */
+    input[type="date"]::-moz-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+    }
+
+    /* Edge (старый) */
+    input[type="date"]::-ms-clear,
+    input[type="date"]::-ms-expand {
+        display: none;
+    }
+
+    input[type="date"] {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none;
+    }
+
+    input[type="date"]:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none;
+    }
+
+    input[type="time"] {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none;
+    }
+
+    input[type="time"]:focus {
+        outline: none !important;
+        box-shadow: none !important;
+        border: none;
+    }
+</style>
 <body>
-<div id="genre-modal" class="modal_event" style="display:none;" data-all-genres='{{ genre_all_list|tojson }}' data-event-id="{{ event.id }}"
+<div id="genre-modal" class="modal_event" style="display:none;" data-all-genres='{{ genre_all_list|tojson }}'
+     data-event-id="{{ event.id }}"
      data-selected-genres='{{ event.genre|tojson }}'>
-  <div class="modal-content-event">
-    <span class="close_event" onclick="closeGenreModal()">&times;</span>
-    <div class="input-label" style="margin-bottom: 18px; font-size: 20px; margin-right: 90%;font-family: Instrument Sans,serif;font-weight: bold;">Genre</div>
+    <div class="modal-content-event">
+        <span class="close_event" onclick="closeGenreModal()">&times;</span>
+        <div class="input-label"
+             style="margin-bottom: 18px; font-size: 20px; margin-right: 90%;font-family: Instrument Sans,serif;font-weight: bold;">
+            Genre
+        </div>
 
-    <div class="genre-select-block">
+        <div class="genre-select-block">
 
-      <div class="genre-tag-row" id="modal-genre-tags">
+            <div class="genre-tag-row" id="modal-genre-tags">
 
-	  </div>
+            </div>
 
-		<div id="genre-input-trigger" style="display: none;">
-      <div class="genre-input-trigger"  onclick="openGenreDropdown()">
+            <div id="genre-input-trigger" style="display: none;">
+                <div class="genre-input-trigger" onclick="openGenreDropdown()">
 
-		  <img src="/static/images/magnifying_glass.svg" class="search-icon" alt="search" />
-        <input id="genre-search" type="text" placeholder="Search genre.." autocomplete="off" oninput="filterGenreList()" onclick="openGenreDropdown()" />
-        <span class="dropdown-icon" >&#x25BC;</span>
+                    <img src="/static/images/magnifying_glass.svg" class="search-icon" alt="search"/>
+                    <input id="genre-search" type="text" placeholder="Search genre.." autocomplete="off"
+                           oninput="filterGenreList()" onclick="openGenreDropdown()"/>
+                    <span class="dropdown-icon">&#x25BC;</span>
 
-      </div>
+                </div>
 
-      <div id="genre-options-list" class="genre-options-list">
-        <!-- Список жанров тут -->
-      </div>
-			</div>
+                <div id="genre-options-list" class="genre-options-list">
+                    <!-- Список жанров тут -->
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:16px;justify-content:flex-end;margin-top:32px;margin-left: 70%;">
+            <button onclick="closeGenreModal()" class="btn btn-outline">Cancel</button>
+            <button onclick="saveGenreSelection()" class="btn btn-primary">Save</button>
+        </div>
     </div>
-
-    <div style="display:flex;gap:16px;justify-content:flex-end;margin-top:32px;margin-left: 70%;">
-      <button onclick="closeGenreModal()" class="btn btn-outline">Cancel</button>
-      <button onclick="saveGenreSelection()" class="btn btn-primary">Save</button>
-    </div>
-  </div>
 </div>
 <div id="over" style="
   position: fixed; z-index: 9998;
@@ -977,7 +1024,7 @@ input[type="time"]:focus {
     border-radius: 10px;
     z-index: 9999;" data-event-id="{{ event.id }}">
 
-  <div style="
+    <div style="
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -986,52 +1033,52 @@ input[type="time"]:focus {
       width: 596px;
       height: 250px;
       ">
-    <div style="
+        <div style="
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         gap: 24px;
         width: 596px;">
 
-      <!-- Первая строка: Даты -->
-      <div style="display: flex; flex-direction: row; gap: 16px; width: 596px;">
-        <!-- Start date -->
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
-          <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">Start date</span>
-          <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
-             <input
-				  class="text9_modal"
-				  id="start-date"
-				  name="start_date"
-				  type="date"
-				  placeholder="Select date"
-				  value="{{ event.event_date.strftime('%Y-%m-%d') }}"
-				  style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
-				/>
-				<img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="calendar"
-				  onclick="document.getElementById('start-date').showPicker && document.getElementById('start-date').showPicker()"
-				  style="cursor:pointer; margin-left:-32px;"
-				/>
-          </div>
-        </div>
-        <!-- End date -->
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
-          <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">End date</span>
-          <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px; position: relative;">
-            <input
-				  class="text9_modal"
-				  id="end-date"
-				  name="end_date"
-				  type="date"
-				  placeholder="Select date"
-				  value="{{ event.event_date_end.strftime('%Y-%m-%d') }}"
-				  style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
-				/>
-				<img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="calendar"
-				  onclick="document.getElementById('end-date').showPicker && document.getElementById('end-date').showPicker()"
-				  style="cursor:pointer; margin-left:-32px;"
-				/>
-            <div style="position: absolute;
+            <!-- Первая строка: Даты -->
+            <div style="display: flex; flex-direction: row; gap: 16px; width: 596px;">
+                <!-- Start date -->
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
+                    <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">Start date</span>
+                    <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
+                        <input
+                                class="text9_modal"
+                                id="start-date"
+                                name="start_date"
+                                type="date"
+                                placeholder="Select date"
+                                value="{{ event.event_date.strftime('%Y-%m-%d') }}"
+                                style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                        />
+                        <img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="calendar"
+                             onclick="document.getElementById('start-date').showPicker && document.getElementById('start-date').showPicker()"
+                             style="cursor:pointer; margin-left:-32px;"
+                        />
+                    </div>
+                </div>
+                <!-- End date -->
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
+                    <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">End date</span>
+                    <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px; position: relative;">
+                        <input
+                                class="text9_modal"
+                                id="end-date"
+                                name="end_date"
+                                type="date"
+                                placeholder="Select date"
+                                value="{{ event.event_date_end.strftime('%Y-%m-%d') }}"
+                                style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                        />
+                        <img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="calendar"
+                             onclick="document.getElementById('end-date').showPicker && document.getElementById('end-date').showPicker()"
+                             style="cursor:pointer; margin-left:-32px;"
+                        />
+                        <div style="position: absolute;
     right: -57px;
     top: 132%;
     display: flex;
@@ -1046,73 +1093,80 @@ input[type="time"]:focus {
     flex: none;
     order: 1;
     flex-grow: 0;">
-              <input type="checkbox" id="end-same-as-start"  style="accent-color: #6D4DFF;">
-              <label for="end-same-as-start" style="font-family: 'Raleway'; font-weight: 600; font-size: 12px; color: #6D4DFF; margin-left: 8px; cursor: pointer; ">Same as a start date</label>
+                            <input type="checkbox" id="end-same-as-start" style="accent-color: #6D4DFF;">
+                            <label for="end-same-as-start"
+                                   style="font-family: 'Raleway'; font-weight: 600; font-size: 12px; color: #6D4DFF; margin-left: 8px; cursor: pointer; ">Same
+                                as a start date</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Вторая строка: Время -->
-      <div style="display: flex; flex-direction: row; gap: 16px; width: 596px;">
-        <!-- Start time -->
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
-          <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">Start time</span>
-          <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
-            <input
-				  class="text9_modal"
-				  id="start-time"
-				  name="start_time"
-				  type="time"
-				  placeholder="Select time"
-				  value="{{ event.event_date.strftime('%H:%M') }}"
-				  style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
-				/>
-				<img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="clock"
-				  onclick="document.getElementById('start-time').showPicker && document.getElementById('start-time').showPicker()"
-				  style="cursor:pointer; margin-left:-32px;"
-				/>
-          </div>
+            <!-- Вторая строка: Время -->
+            <div style="display: flex; flex-direction: row; gap: 16px; width: 596px;">
+                <!-- Start time -->
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
+                    <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">Start time</span>
+                    <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
+                        <input
+                                class="text9_modal"
+                                id="start-time"
+                                name="start_time"
+                                type="time"
+                                placeholder="Select time"
+                                value="{{ event.event_date.strftime('%H:%M') }}"
+                                style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                        />
+                        <img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="clock"
+                             onclick="document.getElementById('start-time').showPicker && document.getElementById('start-time').showPicker()"
+                             style="cursor:pointer; margin-left:-32px;"
+                        />
+                    </div>
+                </div>
+                <!-- End time -->
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
+                    <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">End time</span>
+                    <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
+                        <input
+                                class="text9_modal"
+                                id="end-time"
+                                name="end_time"
+                                type="time"
+                                placeholder="Select time"
+                                value="{{ event.event_date_end.strftime('%H:%M') }}"
+                                style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                        />
+                        <img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="clock"
+                             onclick="document.getElementById('end-time').showPicker && document.getElementById('end-time').showPicker()"
+                             style="cursor:pointer; margin-left:-32px;"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- End time -->
-        <div style="display: flex; flex-direction: column; gap: 10px; width: 290px;">
-          <span style="font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px;">End time</span>
-          <div style="display: flex; align-items: center; background: #F3F3F3; border-radius: 8px; height: 47px; padding: 14px 16px;">
-            <input
-				  class="text9_modal"
-				  id="end-time"
-				  name="end_time"
-				  type="time"
-				  placeholder="Select time"
-				  value="{{ event.event_date_end.strftime('%H:%M') }}"
-				  style="flex:1; background: #f3f3f3; border:none; border-radius:8px; font-size:16px;"
-				/>
-				<img src="/static/images/sidebar/CalendarBlank.svg" class="input-calendar" alt="clock"
-				  onclick="document.getElementById('end-time').showPicker && document.getElementById('end-time').showPicker()"
-				  style="cursor:pointer; margin-left:-32px;"
-				/>
-          </div>
+        <!-- Кнопки -->
+        <div style="display: flex; flex-direction: row; gap: 12px; margin-left: auto;">
+            <button onclick="closeDateModal()"
+                    style="box-sizing: border-box; border: 2px solid #D4D2FF; border-radius: 8px; width: 85px; height: 46px; background: none; color: #6D4DFF; font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px; cursor: pointer;">
+                Cancel
+            </button>
+            <button onclick="saveDates()"
+                    style="background: #6D4DFF; border-radius: 8px; width: 69px; height: 46px; color: #fff; font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px; border: none; cursor: pointer;">
+                Save
+            </button>
         </div>
-      </div>
     </div>
-    <!-- Кнопки -->
-    <div style="display: flex; flex-direction: row; gap: 12px; margin-left: auto;">
-      <button onclick="closeDateModal()" style="box-sizing: border-box; border: 2px solid #D4D2FF; border-radius: 8px; width: 85px; height: 46px; background: none; color: #6D4DFF; font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px; cursor: pointer;">Cancel</button>
-      <button  onclick="saveDates()" style="background: #6D4DFF; border-radius: 8px; width: 69px; height: 46px; color: #fff; font-family: 'Instrument Sans'; font-weight: 600; font-size: 16px; border: none; cursor: pointer;">Save</button>
-    </div>
-  </div>
 </div>
-  <div class="desktop-event-create">
-  {% include 'admin/sidebar.html' %}
-
+<div class="desktop-event-create">
+    {% include 'admin/sidebar.html' %}
 
 
     <div class="column5">
-					<div class="column4">
-					<div class="row-view9">
-						<button
-							  type="button"
-							  style="
+        <div class="column4">
+            <div class="row-view9">
+                <button
+                        type="button"
+                        style="
 								background: none;
 								border: none;
 								padding: 0;
@@ -1120,412 +1174,420 @@ input[type="time"]:focus {
 								cursor: pointer;
 								outline: none;
 							  "
-							   onclick="window.location.href='/admin/events'"
-							  aria-label="Назад"
-							>
-							  <img src="/static/images/sidebar/left.svg" alt="Back" draggable="false" style="display: block;" />
-							</button>
-						<div class="row-view10">
-							<div class="view2">
+                        onclick="window.location.href='/admin/events'"
+                        aria-label="Назад"
+                >
+                    <img src="/static/images/sidebar/left.svg" alt="Back" draggable="false" style="display: block;"/>
+                </button>
+                <div class="row-view10">
+                    <div class="view2">
 								<span class="text_last">
 									{{ last_edit }}
 								</span>
-							</div>
-							<div class="row-view11">
-									{% if event.status == 'draft' %}
-										<form action="/admin/events" method="POST">
-								<input hidden="hidden" name="event_id" value="{{ event.id }}">
-											<input hidden="hidden" name="action" value="delete">
-								<button class="button2">
-									<span class="text7" >
+                    </div>
+                    <div class="row-view11">
+                        {% if user_active['role'] != 'viewer' %}
+                        {% if event.status == 'draft' %}
+
+                        <form action="/admin/events" method="POST">
+                            <input hidden="hidden" name="event_id" value="{{ event.id }}">
+                            <input hidden="hidden" name="action" value="delete">
+
+                            <button class="button2">
+									<span class="text7">
 										Delete draft
 									</span>
-								</button>
-											</form>
-							{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
 
-								<button class="button2">
-									<span class="text7" >
-										Preview
-									</span>
-								</button>
-								{% if event.status == 'draft' %}
-								<form action="/admin/events" method="POST">
-									<input hidden="hidden" name="action" value="add">
-								<input hidden="hidden" name="event_id" value="{{ event.id }}">
-							  <button type="submit" class="button3"
-									  style="background: #6D4DFF; border: none; border-radius: 6px; font-weight: 600;">
-								<span class="text5" >
+                        {% if event.status == 'draft' %}
+                        <form action="/admin/events" method="POST">
+                            <input hidden="hidden" name="action" value="add">
+                            <input hidden="hidden" name="event_id" value="{{ event.id }}">
+                            <button type="submit" class="button3"
+                                    style="background: #6D4DFF; border: none; border-radius: 6px; font-weight: 600;">
+								<span class="text5">
 										Publish
 									</span>
-							  </button>
-							</form>
-								{% endif %}
-							</div>
-						</div>
-					</div>
-					<div class="row-view12">
-						<div class="column5">
+                            </button>
+                        </form>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row-view12">
+                <div class="column5">
 
-							<div
-							  class="event-card-image"
-							  style="
+                    <div
+                            class="event-card-image"
+                            style="
 								width: 700px;
 								height: 269px;
 								border-radius: 8px 8px 0 0;
 								position: relative;
 								background: url('{{ event_image_path(event.card_filename ~ '.' ~ event.card_ext) }}') center/cover no-repeat;
 							  "
-							>
-							</div>
+                    >
+                    </div>
 
-							<div class="column6">
-								<div class="row-view13">
-									{% for genre in event.genre %}
-									<div class="button-row-view">
-										<span class="text_6" >
+                    <div class="column6">
+                        <div class="row-view13">
+                            {% for genre in event.genre %}
+                            <div class="button-row-view">
+										<span class="text_6">
 											{{ genre }}
 										</span>
-										<form action="/admin/genre/edit/{{ event.id }}/{{ genre }}/delete" method="POST" style="display:inline;">
-											<input type="hidden" name="event_id" value="{{ event.id }}">
-											<input type="hidden" name="genre_value" value="{{ genre }}">
-											<button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
-												<img src="/static/images/X.svg" alt="Delete" />
-											</button>
-										</form>
-									</div>
-									{% endfor %}
-											<button onclick="openGenreModal()" style="background: none; border: none; padding: 0; cursor: pointer;">
-												<img src="/static/images/plus.svg" alt="Delete" />
-											</button>
-								</div>
-								<div class="column7">
-									<div class="row-view14">
-											<button onclick="openDateModal()" style="background: none; border: none; padding: 0; cursor: pointer;">
-										<span class="text8" >
+                                <form action="/admin/genre/edit/{{ event.id }}/{{ genre }}/delete" method="POST"
+                                      style="display:inline;">
+                                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                                    <input type="hidden" name="genre_value" value="{{ genre }}">
+                                    <button type="submit"
+                                            style="background: none; border: none; padding: 0; cursor: pointer;">
+                                        <img src="/static/images/X.svg" alt="Delete"/>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                            <button onclick="openGenreModal()"
+                                    style="background: none; border: none; padding: 0; cursor: pointer;">
+                                <img src="/static/images/plus.svg" alt="Delete"/>
+                            </button>
+                        </div>
+                        <div class="column7">
+                            <div class="row-view14">
+                                <button onclick="openDateModal()"
+                                        style="background: none; border: none; padding: 0; cursor: pointer;">
+										<span class="text8">
 
 											{{ date_format }}
 
 										</span>
-												</button>
-										<img
-											src="/static/images/ellipse.svg"
-											class="image9"
-										/>
-										<span class="text9" >
+                                </button>
+                                <img
+                                        src="/static/images/ellipse.svg"
+                                        class="image9"
+                                />
+                                <span class="text9">
 											{{ event.location }}, {{ event.location_address }}, {{ event.city }}
 										</span>
-									</div>
-									<span class="text10" >
+                            </div>
+                            <span class="text10">
 										{{ event.name }}
 									</span>
-									<span class="text11" >
+                            <span class="text11">
 										{{ event.description }}
 									</span>
-								</div>
-								<span class="text12" >
+                        </div>
+                        <span class="text12">
 									{{ event.price_tickets }} czk
 								</span>
-							</div>
-						</div>
-						<div class="column8">
-							<div class="column9">
-								<span class="text13" >
+                    </div>
+                </div>
+                <div class="column8">
+                    <div class="column9">
+								<span class="text13">
 									Ticket sales
 								</span>
-								<div class="column10">
-									<div class="row-view15">
-										<div class="column11">
-											<span class="text6" >
+                        <div class="column10">
+                            <div class="row-view15">
+                                <div class="column11">
+											<span class="text6">
 												Tickets quantity:
 											</span>
-											<span class="text14" >
+                                    <span class="text14">
 												{{ event.tickets_available }}
 											</span>
-										</div>
-										<div class="column11">
-											<span class="text6" >
+                                </div>
+                                <div class="column11">
+											<span class="text6">
 												Price:
 											</span>
-											<span class="text14" >
+                                    <span class="text14">
 												{{ event.price_tickets }} czk
 											</span>
-										</div>
-									</div>
-									<div class="row-view15">
-										<div class="column11">
-											<span class="text6" >
+                                </div>
+                            </div>
+                            <div class="row-view15">
+                                <div class="column11">
+											<span class="text6">
 												Buyer will pay:
 											</span>
-											<span class="text14" >
+                                    <span class="text14">
 												{{ buyer_will_pay }} czk
 											</span>
-										</div>
-										<div class="column11">
-											<span class="text6" >
+                                </div>
+                                <div class="column11">
+											<span class="text6">
 												Selling fees:
 											</span>
-											<span class="text14" >
-												{{ selling_fees }} czk
+                                    <span class="text14">
+												{{ selling_fees }} %
 											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="column12">
-								<div class="row-view16">
-									<div class="column13">
-										<span class="text6_rev" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column12">
+                        <div class="row-view16">
+                            <div class="column13">
+										<span class="text6_rev">
 											Tickets sold:
 										</span>
-										<span class="text16" >
+                                <span class="text16">
 											-/{{ event.tickets_sold }}
 										</span>
-									</div>
-									<div class="column11">
-										<span class="text6_rev" >
+                            </div>
+                            <div class="column11">
+										<span class="text6_rev">
 											Revenue:
 										</span>
-										<span class="text14" >
+                                <span class="text14">
 											- czk
 										</span>
-									</div>
-								</div>
-								<button class="button4"
-									onclick="alert('Pressed!')"}>
-									<span class="text7" >
+                            </div>
+                        </div>
+                        <button class="button4"
+                                onclick="alert('Pressed!')" }>
+									<span class="text7">
 										View Report
 									</span>
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-  </body>
-
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-const genreModal = document.getElementById("genre-modal");
-const allGenres = JSON.parse(genreModal.dataset.allGenres);
-let selectedGenres = JSON.parse(genreModal.dataset.selectedGenres);
-let modalGenres = [...selectedGenres];
-let genreDropdownOpen = false;
+    const genreModal = document.getElementById("genre-modal");
+    const allGenres = JSON.parse(genreModal.dataset.allGenres);
+    let selectedGenres = JSON.parse(genreModal.dataset.selectedGenres);
+    let modalGenres = [...selectedGenres];
+    let genreDropdownOpen = false;
 
-function openGenreModal() {
-  document.getElementById('genre-modal').style.display = "flex";
-  modalGenres = [...selectedGenres];
-  document.getElementById('genre-search').value = '';
-  renderModalTags();
-  renderGenreOptions();
-  closeGenreDropdown(); // всегда сначала закрываем
-}
-
-function openDateModal() {
-  document.getElementById('date-modal').style.display = "flex";
-  document.getElementById('over').style.display = "flex";
-  //
-  // renderModalTags();
-  // renderGenreOptions();
-  // closeGenreDropdown(); // всегда сначала закрываем
-}
-
-function closeGenreModal() {
-  document.getElementById('genre-modal').style.display = "none";
-  closeGenreDropdown();
-}
-
-function closeDateModal() {
-  document.getElementById('date-modal').style.display = "none";
-  document.getElementById('over').style.display = "none";
-}
-
-// ---- DROPDOWN поведение ---- //
-function openGenreDropdown() {
-  document.getElementById('genre-options-list').classList.add('open');
-  genreDropdownOpen = true;
-  renderGenreOptions();
-}
-function closeGenreDropdown() {
-  document.getElementById('genre-options-list').classList.remove('open');
-  genreDropdownOpen = false;
-}
-function toggleGenreDropdown() {
-  genreDropdownOpen ? closeGenreDropdown() : openGenreDropdown();
-}
-
-// Клик вне genre-select-block закрывает dropdown
-document.addEventListener('mousedown', function(e) {
-  const modal = document.getElementById('genre-modal');
-  const dropdown = document.getElementById('genre-options-list');
-  if (
-    genreDropdownOpen &&
-    !e.target.closest('.genre-select-block') &&
-    !e.target.closest('#genre-options-list')
-  ) {
-    closeGenreDropdown();
-  }
-});
-
-// Открытие dropdown по фокусу на input
-document.getElementById('genre-search').addEventListener('focus', openGenreDropdown);
-// По клику на стрелку или поле
-document.querySelector('.dropdown-icon').addEventListener('mousedown', function(e) {
-  e.preventDefault();
-  toggleGenreDropdown();
-});
-
-// ---- Рендер тегов ---- //
-function renderModalTags() {
-  const cont = document.getElementById('modal-genre-tags');
-  const btn = document.createElement('button');
-  btn.id = "toggle-search-btn";
-  btn.style.background = "none";
-  btn.style.border = "none";
-  btn.style.cursor = "pointer";
-  btn.onclick = toggleGenreSearch;
-
-
-  const img = document.createElement('img');
-  img.src = "/static/images/down.svg";
-  img.className = "search-icon";
-  img.alt = "search";
-  img.width = 22;
-  img.height = 22;
-  cont.innerHTML = "";
-
-  modalGenres.forEach(g => {
-    const tag = document.createElement('span');
-    tag.className = "genre-tag";
-    tag.innerHTML = g + '<span class="tag-close" onclick="removeGenreFromModal(\'' + g + '\')">&times;</span>';
-    cont.appendChild(tag);
-
-  });
-  btn.appendChild(img);
-	cont.appendChild(btn);
-}
-
-// ---- Удалить тег ---- //
-function removeGenreFromModal(g) {
-  modalGenres = modalGenres.filter(x => x !== g);
-  renderModalTags();
-  renderGenreOptions();
-}
-
-// ---- Рендер выпадающего списка ---- //
-function renderGenreOptions() {
-  const list = document.getElementById('genre-options-list');
-  const search = document.getElementById('genre-search').value.toLowerCase();
-  list.innerHTML = "";
-  let hasAny = false;
-  allGenres.filter(g => g.toLowerCase().includes(search)).forEach(g => {
-    const div = document.createElement('div');
-    div.className = "genre-option" + (modalGenres.includes(g) ? " disabled" : "");
-    div.textContent = g;
-    if (!modalGenres.includes(g)) {
-      div.onclick = () => {
-        modalGenres.push(g);
+    function openGenreModal() {
+        document.getElementById('genre-modal').style.display = "flex";
+        modalGenres = [...selectedGenres];
+        document.getElementById('genre-search').value = '';
         renderModalTags();
         renderGenreOptions();
-        document.getElementById('genre-search').value = '';
-        document.getElementById('genre-search').focus();
-      };
+        closeGenreDropdown(); // всегда сначала закрываем
     }
-    list.appendChild(div);
-    hasAny = true;
-  });
-  if (!hasAny) {
-    const empty = document.createElement('div');
-    empty.className = "genre-option disabled";
-    empty.textContent = "No results";
-    list.appendChild(empty);
-  }
-}
 
-function filterGenreList() { renderGenreOptions(); }
+    function openDateModal() {
+        document.getElementById('date-modal').style.display = "flex";
+        document.getElementById('over').style.display = "flex";
+        //
+        // renderModalTags();
+        // renderGenreOptions();
+        // closeGenreDropdown(); // всегда сначала закрываем
+    }
+
+    function closeGenreModal() {
+        document.getElementById('genre-modal').style.display = "none";
+        closeGenreDropdown();
+    }
+
+    function closeDateModal() {
+        document.getElementById('date-modal').style.display = "none";
+        document.getElementById('over').style.display = "none";
+    }
+
+    // ---- DROPDOWN поведение ---- //
+    function openGenreDropdown() {
+        document.getElementById('genre-options-list').classList.add('open');
+        genreDropdownOpen = true;
+        renderGenreOptions();
+    }
+
+    function closeGenreDropdown() {
+        document.getElementById('genre-options-list').classList.remove('open');
+        genreDropdownOpen = false;
+    }
+
+    function toggleGenreDropdown() {
+        genreDropdownOpen ? closeGenreDropdown() : openGenreDropdown();
+    }
+
+    // Клик вне genre-select-block закрывает dropdown
+    document.addEventListener('mousedown', function (e) {
+        const modal = document.getElementById('genre-modal');
+        const dropdown = document.getElementById('genre-options-list');
+        if (
+            genreDropdownOpen &&
+            !e.target.closest('.genre-select-block') &&
+            !e.target.closest('#genre-options-list')
+        ) {
+            closeGenreDropdown();
+        }
+    });
+
+    // Открытие dropdown по фокусу на input
+    document.getElementById('genre-search').addEventListener('focus', openGenreDropdown);
+    // По клику на стрелку или поле
+    document.querySelector('.dropdown-icon').addEventListener('mousedown', function (e) {
+        e.preventDefault();
+        toggleGenreDropdown();
+    });
+
+    // ---- Рендер тегов ---- //
+    function renderModalTags() {
+        const cont = document.getElementById('modal-genre-tags');
+        const btn = document.createElement('button');
+        btn.id = "toggle-search-btn";
+        btn.style.background = "none";
+        btn.style.border = "none";
+        btn.style.cursor = "pointer";
+        btn.onclick = toggleGenreSearch;
 
 
-function saveGenreSelection() {
-  selectedGenres = [...modalGenres];
-  closeGenreModal();
-  const eventId = document.getElementById('genre-modal').dataset.eventId;
-  fetch(`/admin/genre/edit/${eventId}/bulk/add`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ genres: selectedGenres })
-  })
-  .then(response => response.json())
-  .then(data => {
-    location.reload();
-  })
-  .catch();
-  location.reload();
-}
+        const img = document.createElement('img');
+        img.src = "/static/images/down.svg";
+        img.className = "search-icon";
+        img.alt = "search";
+        img.width = 22;
+        img.height = 22;
+        cont.innerHTML = "";
 
-function saveDates() {
-  closeDateModal();
-  const start_date = document.getElementById('start-date').value;
-  const end_date = document.getElementById('end-date').value;
-  const start_time = document.getElementById('start-time').value;
-  const end_time = document.getElementById('end-time').value;
-  const eventId = document.getElementById('date-modal').dataset.eventId;
+        modalGenres.forEach(g => {
+            const tag = document.createElement('span');
+            tag.className = "genre-tag";
+            tag.innerHTML = g + '<span class="tag-close" onclick="removeGenreFromModal(\'' + g + '\')">&times;</span>';
+            cont.appendChild(tag);
 
-  fetch(`/admin/event/edit/${eventId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      start_date: start_date,
-      end_date: end_date,
-      start_time: start_time,
-      end_time: end_time
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    location.reload();
-  })
-  .catch();
-   location.reload();
-}
-function toggleGenreSearch() {
+        });
+        btn.appendChild(img);
+        cont.appendChild(btn);
+    }
 
-  const trigger = document.getElementById('genre-input-trigger');
-  if (trigger.style.display === 'none' || !trigger.style.display) {
-    trigger.style.display = 'flex';
-    document.getElementById('genre-search').focus();
-  } else {
-    trigger.style.display = 'none';
-    document.getElementById('genre-search').value = '';
-    filterGenreList();
-  }
-}
+    // ---- Удалить тег ---- //
+    function removeGenreFromModal(g) {
+        modalGenres = modalGenres.filter(x => x !== g);
+        renderModalTags();
+        renderGenreOptions();
+    }
+
+    // ---- Рендер выпадающего списка ---- //
+    function renderGenreOptions() {
+        const list = document.getElementById('genre-options-list');
+        const search = document.getElementById('genre-search').value.toLowerCase();
+        list.innerHTML = "";
+        let hasAny = false;
+        allGenres.filter(g => g.toLowerCase().includes(search)).forEach(g => {
+            const div = document.createElement('div');
+            div.className = "genre-option" + (modalGenres.includes(g) ? " disabled" : "");
+            div.textContent = g;
+            if (!modalGenres.includes(g)) {
+                div.onclick = () => {
+                    modalGenres.push(g);
+                    renderModalTags();
+                    renderGenreOptions();
+                    document.getElementById('genre-search').value = '';
+                    document.getElementById('genre-search').focus();
+                };
+            }
+            list.appendChild(div);
+            hasAny = true;
+        });
+        if (!hasAny) {
+            const empty = document.createElement('div');
+            empty.className = "genre-option disabled";
+            empty.textContent = "No results";
+            list.appendChild(empty);
+        }
+    }
+
+    function filterGenreList() {
+        renderGenreOptions();
+    }
+
+
+    function saveGenreSelection() {
+        selectedGenres = [...modalGenres];
+        closeGenreModal();
+        const eventId = document.getElementById('genre-modal').dataset.eventId;
+        fetch(`/admin/genre/edit/${eventId}/bulk/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({genres: selectedGenres})
+        })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            })
+            .catch();
+        location.reload();
+    }
+
+    function saveDates() {
+        closeDateModal();
+        const start_date = document.getElementById('start-date').value;
+        const end_date = document.getElementById('end-date').value;
+        const start_time = document.getElementById('start-time').value;
+        const end_time = document.getElementById('end-time').value;
+        const eventId = document.getElementById('date-modal').dataset.eventId;
+
+        fetch(`/admin/event/edit/${eventId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                start_date: start_date,
+                end_date: end_date,
+                start_time: start_time,
+                end_time: end_time
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            })
+            .catch();
+        location.reload();
+    }
+
+    function toggleGenreSearch() {
+
+        const trigger = document.getElementById('genre-input-trigger');
+        if (trigger.style.display === 'none' || !trigger.style.display) {
+            trigger.style.display = 'flex';
+            document.getElementById('genre-search').focus();
+        } else {
+            trigger.style.display = 'none';
+            document.getElementById('genre-search').value = '';
+            filterGenreList();
+        }
+    }
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const checkbox = document.getElementById('end-same-as-start');
-  const startDate = document.getElementById('start-date');
-  const endDate = document.getElementById('end-date');
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('end-same-as-start');
+        const startDate = document.getElementById('start-date');
+        const endDate = document.getElementById('end-date');
 
-  checkbox.addEventListener('change', function() {
-    if (this.checked) {
-      endDate.value = startDate.value;
-      endDate.setAttribute('readonly', 'readonly');
-    } else {
-      endDate.removeAttribute('readonly');
-      endDate.value = '';
-    }
-  });
+        checkbox.addEventListener('change', function () {
+            if (this.checked) {
+                endDate.value = startDate.value;
+                endDate.setAttribute('readonly', 'readonly');
+            } else {
+                endDate.removeAttribute('readonly');
+                endDate.value = '';
+            }
+        });
 
-  // Если дата старта поменялась и чекбокс активен — обновить конец
-  startDate.addEventListener('change', function() {
-    if (checkbox.checked) {
-      endDate.value = startDate.value;
-    }
-  });
-});
+        // Если дата старта поменялась и чекбокс активен — обновить конец
+        startDate.addEventListener('change', function () {
+            if (checkbox.checked) {
+                endDate.value = startDate.value;
+            }
+        });
+    });
 </script>
 </html>

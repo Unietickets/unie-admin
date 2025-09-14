@@ -619,7 +619,7 @@ h1, h2, h3, h4,
                                 <li>
                                     <a class="dropdown-item {{ 'text-danger' if user.status == 'Active'  else 'text-success' }}"
                                        href="#"
-                                       onclick="confirmBlock(event, '{{ url_for('edit_status', user_id=user.id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
+                                       onclick="confirmBlock(event, '{{ url_for('edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
                                         <i class="bi {{ 'bi-ban' if user.status == 'Active'  else 'bi-check-circle' }}"></i>
                                         {{ 'Ban' if user.status == 'Active' else 'Activate' }}
                                     </a>
@@ -691,7 +691,7 @@ h1, h2, h3, h4,
             </svg>
           </div>
           <div class="frame-18">
-            <p class="text-wrapper-5">No clients to show.</p>
+            <p class="text-wrapper-5">No users to show.</p>
               {% if user_active['role'] == 'admin' or user_active['role'] == 'organizer' %}
             <button class="btn-export" onclick="openCreateModal()"><span class="text-md-bold">Create user</span></button>
               {% endif%}

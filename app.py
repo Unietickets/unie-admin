@@ -6,7 +6,7 @@ import string
 import uuid
 from datetime import datetime, date, timedelta
 import boto3
-from flask import Flask, session, redirect, url_for, request, render_template, current_app, flash
+from flask import Flask, session, redirect, url_for, request, render_template, current_app, flash, abort
 from sqlalchemy import VARCHAR, TEXT, DECIMAL, UUID
 from itsdangerous import Serializer, BadSignature, SignatureExpired
 from flask_mail import Mail, Message
@@ -49,7 +49,6 @@ s3 = boto3.client(
     region_name="region"
 )
 
-selling_fees = 50
 
 class User(db.Model):
     __tablename__ = 'User'
@@ -102,6 +101,12 @@ class Event(db.Model):
     tickets = db.relationship('Ticket', backref='event', cascade="all, delete")
     deals = db.relationship('Deal', backref='event', cascade="all, delete")
     recommendations = db.relationship('RecommendedEvent', backref='event', cascade="all, delete")
+    node_id = db.Column(
+        db.String(36),
+        db.ForeignKey('Nodes.node_id', ondelete='CASCADE'),
+        nullable=False,
+        default=lambda: str(uuid.uuid4())
+    )
 
 
 class Transaction(db.Model):
@@ -240,10 +245,26 @@ def utility_processor():
 
     return dict(event_image_path=event_image_path)
 
+@app.before_request
+def load_current_user():
+    if request.endpoint in ('static','admin_login','forgot_password','reset_password',):
+        return
+    user_id = session.get('user_id')
+    if user_id:
+        users_info = db.session.get(UserAdmin, user_id)
+        if users_info.status == 'Banned':
+            session.pop('user_id', None)
+            return
+        session['role'] = users_info.role
+        session['context_type'] = users_info.context_type
+        return
+    else:
+        return render_template('403.html')
+
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return redirect(url_for('admin_login'))
 
 
 def is_authenticated():
@@ -584,7 +605,6 @@ def format_last_edit(ts):
 @app.route('/admin/event/<int:event_id>', methods=['GET'])
 def info_event(event_id):
     if is_authenticated():
-        user_active = session['email_user']
         photo_card = aliased(EventPhoto)
         photo_page = aliased(EventPhoto)
         file_card = aliased(File)
@@ -620,7 +640,9 @@ def info_event(event_id):
         for genre in genre_all:
             genre_all_list.append(genre.name)
         last_edit = format_last_edit(event.last_edit)
-        buyer_will_pay = round(float(event.price_tickets) + selling_fees)
+        node_info = db.session.query(Nodes).filter(Nodes.node_id == session['node_id']).first()
+        selling_fees = node_info.commission
+        buyer_will_pay = round(float(event.price_tickets) * selling_fees / 100)
         return render_template('admin/event_info.html', event=event, date_format=date_format, genre_all_list=genre_all_list,last_edit=last_edit, selling_fees=selling_fees, buyer_will_pay=buyer_will_pay,user_active=dict(session))
     else:
         return render_template('403.html')
@@ -914,7 +936,6 @@ def create_event():
     if not is_authenticated():
         return render_template('403.html')
     UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'tmp')
-    user_active = session['email_user']
     if request.method == 'POST':
         if request.form.get('step') == 'step_1':
             session['event_name'] = request.form.get('event_name')
@@ -949,7 +970,7 @@ def create_event():
                 end_dt = f"{session['end_date']} {session['end_time']}"
                 event = Event(name=session['event_name'], genre=genres_list,tickets_available=available_quantity_tickets,price_tickets=price,
                               event_date=start_dt, location=session['venue_name'],
-                              description=session['event_desc'],event_date_end=end_dt,location_address=session['venue_address'],city=session['venue_city'],last_edit=last_updated)
+                              description=session['event_desc'],event_date_end=end_dt,location_address=session['venue_address'],city=session['venue_city'],last_edit=last_updated, node_id=session['node_id'])
                 db.session.add(event)
                 db.session.commit()
                 event_id = event.id
@@ -1046,7 +1067,6 @@ def admin_events():
         if request.method == 'GET':
             page = int(request.args.get('page', 1))
             per_page = 8
-            user_active = session['email_user']
             photo_card = aliased(EventPhoto)
             photo_page = aliased(EventPhoto)
             file_card = aliased(File)
@@ -1054,7 +1074,10 @@ def admin_events():
             tab = request.args.get('tab', 'unpublished')
             q = request.args.get('q', '').strip()
             now = datetime.now()
-            base_query = db.session.query(Event)
+            if session['context_type'] == 'root':
+                base_query = db.session.query(Event)
+            else:
+                base_query = db.session.query(Event).filter(Event.node_id == session['node_id'])
             if q:
                 search = f"%{q.lower()}%"
                 query = base_query.filter(
@@ -1089,20 +1112,35 @@ def admin_events():
                                        unpublished_count=unpublished_count,
                                        q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=dict(session))
             else:
-                # 1. Базовый запрос
-                base_query = (
-                    db.session.query(Event)
-                    .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
-                    .outerjoin(file_card, file_card.id == photo_card.file_id)
-                    .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
-                    .outerjoin(file_page, file_page.id == photo_page.file_id)
-                    .add_columns(
-                        file_card.id.label("card_filename"),
-                        file_page.id.label("page_filename"),
-                        file_card.originalname.label("card_ext"),
-                        file_page.originalname.label("page_ext")
+                if session['context_type'] == 'root':
+                    base_query = (
+                        db.session.query(Event)
+                        .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+                        .outerjoin(file_card, file_card.id == photo_card.file_id)
+                        .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+                        .outerjoin(file_page, file_page.id == photo_page.file_id)
+                        .add_columns(
+                            file_card.id.label("card_filename"),
+                            file_page.id.label("page_filename"),
+                            file_card.originalname.label("card_ext"),
+                            file_page.originalname.label("page_ext")
+                        )
                     )
-                )
+                else:
+                    base_query = (
+                        db.session.query(Event)
+                        .filter(Event.node_id == session['node_id'])
+                        .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+                        .outerjoin(file_card, file_card.id == photo_card.file_id)
+                        .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+                        .outerjoin(file_page, file_page.id == photo_page.file_id)
+                        .add_columns(
+                            file_card.id.label("card_filename"),
+                            file_page.id.label("page_filename"),
+                            file_card.originalname.label("card_ext"),
+                            file_page.originalname.label("page_ext")
+                        )
+                    )
 
                 # 2. Фильтрация по табу
                 if tab == 'upcoming':
@@ -1146,7 +1184,6 @@ def admin_events():
                     total_pages=total_pages
                 )
         else:
-            print(request.form)
             if request.form['action'] == 'add':
                 event = db.session.query(Event).filter_by(id=request.form['event_id']).first()
                 event.status = 'upcoming'
@@ -1322,6 +1359,13 @@ def admin_tickets():
     else:
         return render_template('403.html')
 
+@app.route('/admin/qr_check_in', methods=['GET'])
+def admin_qr_check_in():
+    if is_authenticated():
+
+        return render_template('admin/qr_scanner.html', user_active=dict(session))
+    else:
+        return render_template('403.html')
 
 @app.route('/admin/deals', methods=['GET'])
 def admin_deals():

@@ -138,10 +138,12 @@
                 </a>
               </li>
             </ul>
-            <button class="button" aria-label="Create event" onclick="location.href='events/create'">
+            {% if user_active['role'] != 'viewer' %}
+            <button class="button" aria-label="Create event" onclick="window.location.href='{{ url_for('create_event') }}'">
               <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
               <div class="frame-6"><span class="text-wrapper-2">Create event</span></div>
             </button>
+            {% endif %}
             {% else %}
              <ul class="frame-2">
             <li class="menu-item {% if request.path.startswith('/admin/qr_check_in') %}div-wrapper{% endif %}">
@@ -305,11 +307,9 @@
 </div>
   </body>
 
-<!-- Modal: Create Node -->
-
 
 <script>
-// --- helpers ---
+
 const slugify = (s) =>
   s.toLowerCase()
    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // убрать диакритику
@@ -337,9 +337,6 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // --- OPTIONAL: уникальность на бэке через AJAX перед отправкой формы ---
-  // Ожидается, что эндпоинты вернут JSON вида { "exists": true/false }
-  // Измените URL на свои.
   try {
     const [nameChk, slugChk] = await Promise.all([
       fetch(`/api/nodes/check_name?name=${encodeURIComponent(nameEl.value)}`),
@@ -368,30 +365,6 @@ form.addEventListener('submit', async (e) => {
     // если проверка упала — даём форме отправиться обычным путём
     console.warn('Uniq check failed:', err);
   }
-
-  // если хотите отправлять AJAX-ом и показывать toast без перезагрузки:
-  // --- UNCOMMENT блок ниже и уберите action/method у формы ---
-  /*
-  e.preventDefault();
-  const payload = {
-    org_name: nameEl.value,
-    slug: slugEl.value,
-    commission: parseInt(document.getElementById('commission').value, 10),
-    organizer_email: document.getElementById('organizerEmail').value
-  };
-  const resp = await fetch('/admin/nodes/create', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(payload)
-  });
-  if (resp.ok) {
-    bootstrap.Modal.getInstance(document.getElementById('createNodeModal')).hide();
-    new bootstrap.Toast(document.getElementById('nodeCreatedToast')).show();
-    // TODO: обновить список нод/таблицу
-  } else {
-    alert('Failed to create node');
-  }
-  */
 });
 </script>
 <script>
