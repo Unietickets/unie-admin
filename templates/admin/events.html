@@ -9,7 +9,11 @@
     <!-- Подключение Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Raleway:wght@600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="desktop-event-list">
       {% include 'admin/sidebar.html' %}
@@ -131,6 +135,7 @@
                 margin-top: 1%;color: #ababab; font-size: 14px; font-weight: 600;">Sold {{ event.tickets_sold }}/{{ event.tickets_available }}</span>
             {% if event.status == 'draft' %}
             <form action="/admin/events" method="POST">
+                <input hidden="hidden" name="action" value="add">
                 <input hidden="hidden" name="event_id" value="{{ event.id }}">
               <button type="submit" class="btn btn-primary"
                       style="background: #6D4DFF; border: none; border-radius: 6px; font-weight: 600;">

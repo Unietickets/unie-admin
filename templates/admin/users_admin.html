@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/css/intlTelInput.min.css">
+    <!-- Подключение Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Подключение Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+</head>
+<style>
+	:root{
+  --font-ui: 'Instrument Sans', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --font-heading: 'Raleway', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+/* По умолчанию — Instrument Sans */
+body { font-family: var(--font-ui); }
+
+/* Заголовки и лейблы из макета на Raleway */
+h1, h2, h3, h4,
+.title,              /* Orders */
+.event-title,        /* Into the dark... */
+.label, .at-label    /* “at Ankali, Prague”, “Sold” и т.п. */
+{ font-family: var(--font-heading); }
+
+/* Числа ровной ширины (для колонок Quantity/Amount/Order ID) */
+.num, .amount-col, .cell-qty-narrow, .cell-qty-wide {
+  font-variant-numeric: tabular-nums;
+}
+
+	body {
+			font-family: system-ui;
+		}
+		.btn-export {
+			flex-shrink: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFE35F;
+			border-radius: 8px;
+			border: none;
+			padding: 16px 17px;
+			text-align: left;
+		}
+		.status-paid {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #DCFCE8;
+			border-radius: 4px;
+			border: 1px solid #DCFCE8;
+			padding: 6px 12px;
+			text-align: left;
+		}
+		.status-refunded {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FEE2E2;
+			border-radius: 4px;
+			border: none;
+			padding: 6px 12px;
+			text-align: left;
+		}
+		.status-cancelled {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #EFEFEF;
+			border-radius: 4px;
+			border: none;
+			padding: 6px 12px;
+			text-align: left;
+		}
+		.status-pending {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFEC5;
+			border-radius: 4px;
+			border: none;
+			padding: 6px 12px;
+			text-align: left;
+		}
+		.btn-filter {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			background: none;
+			border-radius: 8px;
+			border: 2px solid #FFE35F;
+			padding: 12px 16px;
+			gap: 6px;
+			text-align: left;
+		}
+		.btn-sort {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			background: none;
+			border-radius: 8px;
+			border: 2px solid #FFE35F;
+			padding: 12px 16px;
+			gap: 5px;
+			text-align: left;
+		}
+		.page-column {
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			margin: 48px 54px 361px 54px;
+			gap: 24px;
+		}
+		.table-wrap {
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			gap: 24px;
+		}
+		.page-content {
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 24px;
+		}
+		.table-col {
+			flex-shrink: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.customer-col {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 12px;
+			padding-bottom: 12px;
+			padding-right: 24px;
+		}
+		.event-col {
+			flex: 1;
+		}
+		.amount-col {
+			flex-shrink: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+		.contain {
+			display: flex;
+			flex-direction: column;
+			background: #FFFFFF;
+		}
+		.icon-search {
+			border-radius: 8px;
+			width: 16px;
+			height: 16px;
+			margin-left: 14px;
+			margin-right: 4px;
+			object-fit: fill;
+		}
+		.icon-chevron {
+			border-radius: 8px;
+			width: 16px;
+			height: 16px;
+			object-fit: fill;
+		}
+		.actions-image {
+			width: 84px;
+			height: 54px;
+			object-fit: fill;
+		}
+		.search-input {
+			color: #989898;
+			font-size: 16px;
+			font-weight: bold;
+			flex: 1;
+			align-self: stretch;
+			background: none;
+			border: none;
+		}
+		.toolbar-row {
+			align-self: stretch;
+			display: flex;
+			align-items: flex-start;
+			gap: 12px;
+		}
+		.search-box {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			background: #F5F5F5;
+			border-radius: 8px;
+			padding-top: 12px;
+			padding-bottom: 12px;
+		}
+		.table-rowset {
+			align-self: stretch;
+			display: flex;
+			align-items: flex-start;
+		}
+		.scroll-view {
+			height: 902px;
+			align-self: stretch;
+			background: #FFFFFF;
+		}
+		.title {
+			color: #000000;
+			font-size: 32px;
+			font-weight: bold;
+		}
+		.text-md-bold {
+			color: #000000;
+			font-size: 16px;
+			font-weight: bold;
+		}
+		.text-sm-bold {
+			color: #292929;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.date-top-cell {
+			color: #292929;
+			font-size: 14px;
+			margin-bottom: 19px;
+			margin-right: 37px;
+		}
+		.text-sm {
+			color: #292929;
+			font-size: 14px;
+		}
+		.customer-name {
+			color: #292929;
+			font-size: 12px;
+			font-weight: bold;
+		}
+		.customer-email {
+			color: #292929;
+			font-size: 12px;
+		}
+		.event-title {
+			color: #000000;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.status-paid-text {
+			color: #166533;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.status-refunded-text {
+			color: #991B1B;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.status-cancelled-text {
+			color: #464646;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.status-pending-text {
+			color: #96560A;
+			font-size: 14px;
+			font-weight: bold;
+		}
+		.cell-th {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 11px;
+			padding-bottom: 11px;
+			padding-right: 30px;
+		}
+		.cell {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 18px;
+			padding-bottom: 18px;
+			padding-right: 53px;
+		}
+		/* специфичные ячейки с разной паддинг-правой */
+		/* для точного совпадения старых view2..view9 оставим отдельные селекторы */
+		.cell.view3 { padding-right: 50px; }
+		.cell.view4 { padding-right: 49px; }
+		.cell.view5 { padding-right: 48px; }
+		.header-date {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 11px;
+			padding-bottom: 11px;
+			padding-right: 100px;
+			margin-bottom: 18px;
+		}
+		/* продолжение маппинга */
+		.cell.view7 { padding-right: 59px; }
+		.cell.view8 { padding-right: 61px; }
+		.cell.view9 { padding-right: 62px; }
+		.header-customer {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 11px;
+			padding-bottom: 11px;
+			padding-right: 83px;
+		}
+		.header-event {
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 11px;
+			padding-bottom: 11px;
+		}
+		.cell-wide {
+			align-self: stretch;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding-top: 18px;
+			padding-bottom: 18px;
+		}
+		.header-qty {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 11px 24px;
+		}
+		.cell-qty-narrow {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 18px 87px 18px 24px;
+		}
+		.cell-qty-wide {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 18px 85px 18px 24px;
+		}
+		.cell-amount {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 18px 24px;
+		}
+		.header-status {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 11px 64px 11px 24px;
+		}
+		.cell-status-padded {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 12px 59px 12px 24px;
+		}
+		.cell-status {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 12px 24px;
+		}
+		.header-actions {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			background: #FFFFFF;
+			padding: 11px 1px 11px 25px;
+		}
+		.search-input:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+               .search-event { padding-right: 36px; }
+        .btn-clear{
+  right: 12px;
+  top: 50%;
+  padding-right: 10px;
+  display: none;
+  background: transparent;
+  border: 0;
+  line-height: 0;
+  cursor: pointer;
+}
+.btn-clear.is-visible{ display: inline-flex; }
+.btn-clear:focus{ outline: none; }
+.btn-clear i{ font-size: 18px; opacity: .45; }
+.btn-clear:hover i{ opacity: .9; }
+
+</style>
+<body>
+    <div class="desktop-event-list">
+      {% include 'admin/sidebar.html' %}
+     <main class="frame-11">
+         <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editUserForm" method="POST">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Login</label>
+                        <input type="email" class="form-control" id="editEmail" name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="editPhone" name="phone_displayed" required>
+                    </div>
+                    <input type="hidden" name="phone" id="full_phone">
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">Password</label>
+                        <input type="text" class="form-control" id="editPassword" name="password" required
+                               pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                               title="Пароль должен содержать хотя бы одну заглавную букву, одну цифру и минимум 8 символов.">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editIsActive" class="form-label">Is Active</label>
+                        <select id="editIsActive" class="form-select me-2" name="is_active">
+                            <option value="true">Active</option>
+                            <option value="false">Deactive</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="editUserId" name="user_id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Modal: Создать -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="createUserForm" method="POST" action="/admin/user_admin/create">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create new user</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                      <label class="form-label">Role</label>
+                      <select class="form-select" id="role" name="role">
+                          <option value="organizer">Organizer</option>
+                        <option value="admin">Admin</option>
+                        <option value="viewer">Viewer</option>
+                        <option value="qr_scanner">QR-scanner</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="createEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="createEmail" name="email" required>
+                    </div>
+                    {% if user_active['context_type'] == 'root' %}
+                    <div class="mb-3">
+                      <label class="form-label">Context type</label>
+                      <select class="form-select" id="context_type" name="context_type">
+                          <option value="node">Node</option>
+                        <option value="root">Root</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">Organize</label>
+                      <select class="form-select" id="node_id" name="node_id">
+                           {% for node in nodes %}
+                          <option value="{{ node.node_id }}">{{ node.node_name }}</option>
+                         {% endfor %}
+                      </select>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="node_id" value="{{ user_active['node_id'] }}">
+                    <input type="hidden" name="context_type" value="{{ user_active['context_type'] }}">
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+      </div>
+          <div class="page-content">
+						<span class="title" >
+							Admin-users & Roles
+						</span>
+						<div class="toolbar-row">
+							<div class="search-box">
+								<img
+									src="/static/images/magnifying_glass.svg"
+									class="icon-search"
+								/>
+								<input
+									type="text"
+									placeholder="Search by event name / order id /  customer name"
+									class="search-input"
+                                    id="search-event"
+                                    value="{{ q if request.args.get('q') or request.args.get('page') }}"
+								/>
+                                <button type="button"
+                                      id="clearSearch"
+                                      class="btn-clear {{ 'is-visible' if request.args.get('q') or request.args.get('page') }}"
+                                      aria-label="Clear search">
+                                <i class="bi bi-x-circle"></i>
+                              </button>
+							</div>
+							<button class="btn-filter"
+								onclick="alert('Pressed!')"}>
+								<span class="text-md-bold" >
+									Filter
+								</span>
+								<img
+									src="/static/images/sliders-horizontal.svg"
+									class="icon-chevron"
+								/>
+							</button>
+							<button class="btn-sort"
+								onclick="alert('Pressed!')"}>
+								<span class="text-md-bold" >
+									Sort by
+								</span>
+								<img
+									src="/static/images/arrows-down-up.svg"
+									class="icon-chevron"
+								/>
+							</button>
+                            {% if user_active['role'] == 'admin' or user_active['role'] == 'organizer' %}
+							<button class="btn-export" onclick="openCreateModal()">
+								<span class="text-md-bold" >
+									Create user
+								</span>
+							</button>
+                            {% endif %}
+						</div>
+			  <div class="table-wrap">
+
+					<table class="table table-hover" id="clientsTable">
+            {% if users_info|length > 0 %}
+                        {% if user_active['context_type'] == 'root' %}
+                        <thead>
+              <tr class="text-md-bold">
+                <th>ID</th>
+                <th>Email</th>
+                  <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+                        {%else%}
+            <thead>
+              <tr class="text-md-bold">
+                <th>ID</th>
+                <th>Email</th>
+                  <th>Role</th>
+                <th>Status</th>
+                  {% if user_active['role'] == 'admin' or user_active['role'] == 'organizer' %}
+                <th>Actions</th>
+                  {% endif %}
+              </tr>
+            </thead>
+                        {% endif %}
+            {% endif %}
+            <tbody>
+            {% for user in users_info %}
+             {% if user_active['context_type'] == 'root' %}
+            <tr>
+                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.email }}<a href="mailto:{{ user.email }}" class="ms-2 text-decoration-none">
+                        <i class="bi bi-envelope"></i>
+                    </a></td>
+                    <td>{{ user.role }}</td>
+
+                    <td>{{ user.status }}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                {#        <li><a class="dropdown-item" href="/admin/clients/details/{{ user.user_id  }}"><i class="bi bi-eye"></i> Детали</a></li>#}
+<!--                                <li><a class="dropdown-item" href="#"-->
+<!--                                       onclick="openEditModal('{{ user.user_id  }}', '{{ user.name }}', '{{ user.email }}', '{{ user.password }}', '{{ user.phone_number }}')">-->
+<!--                                    <i class="bi bi-pencil"></i> Edit-->
+<!--                                </a></li>-->
+                                <li>
+                                    <a class="dropdown-item {{ 'text-danger' if user.status == 'Active'  else 'text-success' }}"
+                                       href="#"
+                                       onclick="confirmBlock(event, '{{ url_for('edit_status', user_id=user.id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
+                                        <i class="bi {{ 'bi-ban' if user.status == 'Active'  else 'bi-check-circle' }}"></i>
+                                        {{ 'Ban' if user.status == 'Active' else 'Activate' }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.email }}<a href="mailto:{{ user.email }}" class="ms-2 text-decoration-none">
+                        <i class="bi bi-envelope"></i>
+                    </a></td>
+                    <td>{{ user.role }}</td>
+
+                    <td>{{ user.status }}</td>
+                    {% if user_active['role'] == 'admin' or user_active['role'] == 'organizer' %}
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                                {#        <li><a class="dropdown-item" href="/admin/clients/details/{{ user.user_id  }}"><i class="bi bi-eye"></i> Детали</a></li>#}
+<!--                                <li><a class="dropdown-item" href="#"-->
+<!--                                       onclick="openEditModal('{{ user.user_id  }}', '{{ user.name }}', '{{ user.email }}', '{{ user.password }}', '{{ user.phone_number }}')">-->
+<!--                                    <i class="bi bi-pencil"></i> Edit-->
+<!--                                </a></li>-->
+                                <li>
+                                    <a class="dropdown-item {{ 'text-danger' if user.status != 'Banned'  else 'text-success' }}"
+                                       href="#"
+                                       onclick="confirmBlock(event, '{{ url_for('edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
+                                        <i class="bi {{ 'bi-ban' if user.status == 'Active'  else 'bi-check-circle' }}"></i>
+                                        {{ 'Ban' if user.status == 'Active' else 'Activate' }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+            {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+				</div>
+					</div>
+
+          {% if users_info|length == 0 %}
+        <div class="frame-17">
+          <div class="unie-interface-wrapper">
+            <svg width="101" height="100" viewBox="0 0 101 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.908203" width="100" height="100" rx="50" fill="#FAFAFA"/>
+            <g clip-path="url(#clip0_1806_8911)">
+            <path d="M36.7658 38.4277C36.0838 38.4277 35.4297 38.6987 34.9475 39.1809C34.4653 39.6631 34.1943 40.3172 34.1943 40.9992V64.142C34.1943 64.824 34.4653 65.4781 34.9475 65.9603C35.4297 66.4425 36.0838 66.7135 36.7658 66.7135H65.0515C65.7335 66.7135 66.3875 66.4425 66.8698 65.9603C67.352 65.4781 67.6229 64.824 67.6229 64.142V40.9992C67.6229 40.3172 67.352 39.6631 66.8698 39.1809C66.3875 38.6987 65.7335 38.4277 65.0515 38.4277H59.9086" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M41.9087 33.2852V43.5709" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M59.9087 33.2852V43.5709" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M41.9087 38.4277H54.7658" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M55.4613 57.1224L46.3584 48.0195" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M55.4613 48.0195L46.3584 57.1224" stroke="#1A0044" stroke-width="2.57143" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_1806_8911">
+            <rect width="36" height="36" fill="white" transform="translate(32.9082 32)"/>
+            </clipPath>
+            </defs>
+            </svg>
+          </div>
+          <div class="frame-18">
+            <p class="text-wrapper-5">No clients to show.</p>
+              {% if user_active['role'] == 'admin' or user_active['role'] == 'organizer' %}
+            <button class="btn-export" onclick="openCreateModal()"><span class="text-md-bold">Create user</span></button>
+              {% endif%}
+          </div>
+        </div>
+         {% else %}
+
+
+          <div aria-label="Page navigation">
+  <ul class="pagination">
+    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+      <a class="page-link" href="?page={{ page - 1 }}{% if q %}&q={{ q }}{% endif %}">Previous</a>
+    </li>
+    {% for p in range(1, total_pages + 1) %}
+      <li class="page-item {% if page == p %}active{% endif %}">
+        <a class="page-link" href="?page={{ p }}{% if q %}&q={{ q }}{% endif %}">{{ p }}</a>
+      </li>
+    {% endfor %}
+    <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+      <a class="page-link" href="?page={{ page + 1 }}{% if q %}&q={{ q }}{% endif %}">Next</a>
+    </li>
+  </ul>
+</div>
+         {% endif %}
+      </main>
+    </div>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
+<!-- Подключение Bootstrap JS и Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script>
+(function () {
+  const input = document.getElementById('search-event');
+  const clear = document.getElementById('clearSearch');
+  const url = new URL(window.location.href);
+
+  const pageOrQueryActive = () => url.searchParams.has('q') || url.searchParams.has('page');
+  const toggle = () => {
+    if (input.value.trim() || pageOrQueryActive()) {
+      clear.classList.add('is-visible');
+    } else {
+      clear.classList.remove('is-visible');
+    }
+  };
+
+  input.addEventListener('input', toggle);
+
+  clear.addEventListener('click', () => {
+    input.value = '';
+    // чистим q и page из URL и перезагружаем
+    const u = new URL(window.location.href);
+    u.searchParams.delete('q');
+    u.searchParams.delete('page');
+    window.location.href = u.pathname + (u.searchParams.toString() ? '?' + u.searchParams.toString() : '');
+  });
+
+  toggle();
+})();
+</script>
+<script>
+    function confirmBlock(event, url) {
+        const isBlocking = url.includes("status=false");
+
+        const message = isBlocking
+            ? "Вы уверены, что хотите заблокировать этого пользователя?"
+            : "Вы уверены, что хотите разблокировать этого пользователя?";
+
+        if (confirm(message)) {
+            window.location.href = url;
+        } else {
+            event.preventDefault();
+        }
+    }
+
+    function searchTable() {
+        var input, filter, table, tr, td, i, j, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("clientsTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) { // Начинаем с 1, чтобы пропустить заголовок
+            tr[i].style.display = "none"; // Сначала скрываем строку
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        tr[i].style.display = ""; // Показываем строку, если совпадает
+                        break; // Если найдено совпадение, выходим из внутреннего цикла
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+        var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+            return new bootstrap.Dropdown(dropdownToggleEl)
+        })
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categorySelect = document.getElementById('categorySelect');
+
+        function applyFilters() {
+            const rows = document.querySelectorAll('#clientsTable tbody tr');
+            const selectedCategory = categorySelect.value;
+
+            rows.forEach(row => {
+                const category = row.cells[6].textContent;
+                const matchesCategory = !selectedCategory || category === selectedCategory;
+
+                row.style.display = matchesCategory ? '' : 'none';
+            });
+        }
+
+        categorySelect.addEventListener('change', applyFilters);
+    });
+</script>
+<script>
+    function openEditModal(id, name, email, password, phone) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPassword').value = password;
+
+        if (itiEdit && phone) {
+            itiEdit.setNumber(phone); // Предзаполнить номер с кодом
+            document.getElementById("full_phone").value = itiEdit.getNumber();
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+
+        document.getElementById('editUserForm').action = `/admin/users/edit/${id}`;
+    }
+</script>
+<script>
+    function openCreateModal(id, name, email) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+
+
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+
+        // Задать action формы, если надо:
+        document.getElementById('editUserForm').action = `/admin/users/edit/${id}`;
+    }
+</script>
+<script>
+    function openCreateModal() {
+        // Очистим поля при открытии
+
+        document.getElementById('createEmail').value = '';
+
+
+
+        const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        modal.show();
+    }
+</script>
+    <script>
+const searchInput = document.getElementById('search-event');
+
+searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        doSearch();
+    }
+});
+
+searchInput.addEventListener('blur', function() {
+    doSearch();
+});
+
+function doSearch() {
+    let q = searchInput.value;
+    let params = new URLSearchParams(window.location.search);
+    params.set('q', q);
+    params.set('page', 1);
+    window.location.search = params.toString();
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const clearBtn = document.getElementById('clear-search');
+    // показать кнопку, если есть текст (например, после поиска)
+    if (searchInput && clearBtn) {
+        if (searchInput.value) {
+            clearBtn.style.display = 'block';
+        }
+        // по инпуту тоже управляем видимостью
+        searchInput.addEventListener('input', function() {
+            clearBtn.style.display = this.value ? 'block' : 'none';
+        });
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            clearBtn.style.display = 'none';
+            // searchInput.focus();
+            window.location = '/admin/events?tab=unpublished'
+        });
+    }
+});
+</script>
+<script>
+    let itiCreate, itiEdit;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // инициализация для формы СОЗДАНИЯ
+        const createInput = document.getElementById("phone");
+        if (createInput) {
+            itiCreate = window.intlTelInput(createInput, {
+                initialCountry: "auto",
+                geoIpLookup: callback => {
+                    fetch('https://ipapi.co/json')
+                        .then(res => res.json())
+                        .then(data => callback(data.country_code))
+                        .catch(() => callback('us'));
+                },
+                preferredCountries: ["cz", "ru", "ua"],
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+            });
+
+            createInput.addEventListener('input', () => {
+                const placeholder = createInput.getAttribute("placeholder");
+                const maxLength = placeholder.replace(/\D/g, '').length;
+                const currentDigits = createInput.value.replace(/\D/g, '');
+                if (currentDigits.length > maxLength) {
+                    createInput.value = currentDigits.slice(0, maxLength);
+                }
+                console.log(itiCreate.getNumber())
+                document.getElementById("full_phone_create").value = itiCreate.getNumber();
+            });
+        }
+
+        // инициализация для формы РЕДАКТИРОВАНИЯ
+        const editInput = document.getElementById("editPhone");
+        if (editInput) {
+            itiEdit = window.intlTelInput(editInput, {
+                preferredCountries: ["cz", "ru", "ua"],
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+            });
+
+            editInput.addEventListener('input', () => {
+                const placeholder = editInput.getAttribute("placeholder");
+                const maxLength = placeholder.replace(/\D/g, '').length;
+                const currentDigits = editInput.value.replace(/\D/g, '');
+                if (currentDigits.length > maxLength) {
+                    editInput.value = currentDigits.slice(0, maxLength);
+                }
+                document.getElementById("full_phone").value = itiEdit.getNumber();
+            });
+        }
+    });
+</script>
+  </body>
+</html>

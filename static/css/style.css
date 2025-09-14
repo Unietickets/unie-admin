@@ -1,3 +1,22 @@
+.button_create_node {
+    all: unset;
+    box-sizing: border-box;
+    display: flex
+;
+    align-self: stretch;
+    width: 63%;
+    min-width: 44px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 10px;
+    position: relative;
+    background-color: var(--colors-electric-violet-500);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 .desktop-event-list {
   display: flex;
   /*width: 1440px;*/
@@ -13,7 +32,7 @@
 }
 
 .desktop-event-list .menu-item-sidebar {
-  width: 240px;
+  width: 270px;
   align-items: center;
   gap: 10px;
   padding: 25px 8px;

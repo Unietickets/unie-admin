@@ -684,14 +684,14 @@ cursor: pointer;
 
 
 
-.modal {
+.modal_event {
   position: fixed;
   z-index: 2000;
   left: 0; top: 0; width: 100vw; height: 100vh;
   background: rgba(0,0,0,0.18);
   display: flex; align-items: center; justify-content: center;
 }
-.modal-content {
+.modal-content-event {
   background: #fff;
   border-radius: 10px;
   padding: 32px 32px 24px 32px;
@@ -699,7 +699,7 @@ cursor: pointer;
   position: relative;
   box-shadow: 0 4px 40px rgba(0,0,0,0.13);
 }
-.close {
+.close-event {
   position: absolute; right: 24px; top: 22px; font-size: 28px; cursor: pointer;
 }
 
@@ -923,10 +923,10 @@ input[type="time"]:focus {
 }
 	</style>
 <body>
-<div id="genre-modal" class="modal" style="display:none;" data-all-genres='{{ genre_all_list|tojson }}' data-event-id="{{ event.id }}"
+<div id="genre-modal" class="modal_event" style="display:none;" data-all-genres='{{ genre_all_list|tojson }}' data-event-id="{{ event.id }}"
      data-selected-genres='{{ event.genre|tojson }}'>
-  <div class="modal-content">
-    <span class="close" onclick="closeGenreModal()">&times;</span>
+  <div class="modal-content-event">
+    <span class="close_event" onclick="closeGenreModal()">&times;</span>
     <div class="input-label" style="margin-bottom: 18px; font-size: 20px; margin-right: 90%;font-family: Instrument Sans,serif;font-weight: bold;">Genre</div>
 
     <div class="genre-select-block">
@@ -1166,10 +1166,7 @@ input[type="time"]:focus {
 					</div>
 					<div class="row-view12">
 						<div class="column5">
-<!--							<img-->
-<!--								src="https://storage.googleapis.com/tagjs-prod.appspot.com/v1/twc212wqfw/kpu6ta1u_expires_30_days.png"-->
-<!--								class="image6"-->
-<!--							/>-->
+
 							<div
 							  class="event-card-image"
 							  style="
@@ -1212,7 +1209,7 @@ input[type="time"]:focus {
 										</span>
 												</button>
 										<img
-											src="https://storage.googleapis.com/tagjs-prod.appspot.com/v1/twc212wqfw/8a5bl7yv_expires_30_days.png"
+											src="/static/images/ellipse.svg"
 											class="image9"
 										/>
 										<span class="text9" >
@@ -1307,6 +1304,7 @@ input[type="time"]:focus {
 			</div>
 		</div>
   </body>
+
 <script>
 const genreModal = document.getElementById("genre-modal");
 const allGenres = JSON.parse(genreModal.dataset.allGenres);

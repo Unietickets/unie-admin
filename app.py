@@ -1,6 +1,8 @@
 import math
 import os
+import secrets
 import shutil
+import string
 import uuid
 from datetime import datetime, date, timedelta
 import boto3
@@ -32,6 +34,8 @@ db = SQLAlchemy(app)
 app.config['SECRET_KEY'] = app.secret_key
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'exchangebots@gmail.com'
+app.config['MAIL_PASSWORD'] = 'brhgvxncraffbceq'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 app.config['SECURITY_PASSWORD_SALT'] = 'brhgvxncraffbceq'
@@ -197,22 +201,32 @@ class UserBalance(db.Model):
 
 
 class UserAdmin(db.Model):
+    __tablename__ = 'user_admin'
     user_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     role = db.Column(db.String(100))
     user_hash = db.Column(db.String(100))
+    context_type = db.Column(db.String(100))
+    status = db.Column(db.String(100), default='Active')
     node_id = db.Column(
         db.String(36),
-        db.ForeignKey('User.node_id', ondelete='CASCADE'),
+        db.ForeignKey('Nodes.node_id', ondelete='CASCADE'),
         nullable=False,
         default=lambda: str(uuid.uuid4())
     )
-    user = db.relationship(
-        'User',
-        backref=db.backref('user_admins', lazy=True),
-        primaryjoin="UserAdmin.node_id == User.node_id"
-    )
+
+
+class Nodes(db.Model):
+    __tablename__ = 'Nodes'
+    id = db.Column(db.Integer, primary_key=True)
+    organization_name = db.Column(db.String(100))
+    slug = db.Column(db.String(100), unique=True)
+    commission = db.Column(db.Integer)
+    node_id = db.Column(db.String(36))
+    registration_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 
 
 @app.context_processor
@@ -257,7 +271,8 @@ def admin_login():
         if user:
             if check_password_hash(user.password, password):
                 session['user_id'] = user.user_id
-                session['node_id'] = user.user_id
+                session['node_id'] = user.node_id
+                session['context_type'] = user.context_type
                 session['email_user'] = email
                 session['role'] = user.role
                 return redirect(url_for('stats'))
@@ -351,20 +366,101 @@ def reset_password(token):
 def stats():
     if is_authenticated():
         user_active = session['email_user']
-        return render_template('admin/stats.html', user_active=user_active)
+        return render_template('admin/stats.html', user_active=dict(session))
     return render_template('403.html')
 
 
-@app.route('/admin/users', methods=['GET'])
+@app.route('/admin/clients', methods=['GET'])
 def admin_users():
     if is_authenticated():
-        user_active = session['email_user']
-        users_info = (
-            db.session.query(User)
-            .order_by(User.id)
-            .all()
-        )
-        return render_template('admin/users.html', user_active=user_active, users_info=users_info)
+        page = int(request.args.get('page', 1))
+        per_page = 12
+        if session['context_type'] == 'root':
+
+            users_info = (
+                db.session.query(User)
+                .order_by(User.id)
+                .all()
+            )
+            template_page = 'admin/users.html'
+        else:
+
+            users_info = (
+                db.session.query(User)
+                .order_by(User.id)
+                .filter(User.node_id == session['node_id'])
+                .all()
+            )
+            template_page = 'admin/users.html'
+        q = request.args.get('q', '').strip()
+        if q:
+            base_query = db.session.query(User)
+            search = f"%{q.lower()}%"
+            query = base_query.filter(
+                db.or_(
+                    db.func.lower(User.name).like(search),
+                    db.cast(User.id, db.String).like(f"%{q}%")
+                )
+            )
+            found = query.filter(User.node_id == session['node_id']).all()
+            if not found:
+                users_info = []
+            else:
+                users_info = found
+        total = len(users_info)
+        users_info = users_info[(page - 1) * per_page: page * per_page]  # Только текущая страница
+        total_pages = math.ceil(total / per_page)
+        return render_template(template_page,q=q, total_pages=total_pages, page=page, per_page=per_page, user_active=dict(session), users_info=users_info)
+    else:
+        return render_template('403.html')
+
+
+@app.route('/admin/users_admin', methods=['GET'])
+def users_admin():
+    if is_authenticated():
+        page = int(request.args.get('page', 1))
+        per_page = 12
+        if session['context_type'] == 'root':
+            nodes = []
+            nodes_info = db.session.query(Nodes).all()
+            for node in nodes_info:
+                nodes.append({'node_name': node.organization_name, 'node_id': node.node_id})
+            base_query = db.session.query(UserAdmin).filter(UserAdmin.email != session['email_user'])
+            users_info = (
+                db.session.query(UserAdmin)
+                .order_by(UserAdmin.user_id)
+                .filter(UserAdmin.email != session['email_user'])
+                .all()
+            )
+            template_page = 'admin/users_admin.html'
+        else:
+            nodes = session['node_id']
+            base_query = db.session.query(UserAdmin).filter(UserAdmin.node_id == session['node_id'],UserAdmin.email != session['email_user'])
+            users_info = (
+                db.session.query(UserAdmin)
+                .order_by(UserAdmin.user_id)
+                .filter(UserAdmin.node_id == session['node_id'],UserAdmin.email != session['email_user'])
+                .all()
+            )
+            template_page = 'admin/users_admin.html'
+        q = request.args.get('q', '').strip()
+        if q:
+            search = f"%{q.lower()}%"
+            query = base_query.filter(
+                db.or_(
+                    db.func.lower(UserAdmin.email).like(search),
+                    db.cast(UserAdmin.user_id, db.String).like(f"%{q}%")
+                )
+            )
+            found = query.all()
+            if not found:
+                users_info = []
+            else:
+                users_info = found
+        total = len(users_info)
+        users_info = users_info[(page - 1) * per_page: page * per_page]  # Только текущая страница
+        total_pages = math.ceil(total / per_page)
+        return render_template(template_page,q=q, total_pages=total_pages, page=page, per_page=per_page, user_active=dict(session), users_info=users_info,nodes=nodes)
     else:
         return render_template('403.html')
 
@@ -525,7 +621,7 @@ def info_event(event_id):
             genre_all_list.append(genre.name)
         last_edit = format_last_edit(event.last_edit)
         buyer_will_pay = round(float(event.price_tickets) + selling_fees)
-        return render_template('admin/event_info.html', event=event, date_format=date_format, genre_all_list=genre_all_list,last_edit=last_edit, selling_fees=selling_fees, buyer_will_pay=buyer_will_pay,user_active=user_active)
+        return render_template('admin/event_info.html', event=event, date_format=date_format, genre_all_list=genre_all_list,last_edit=last_edit, selling_fees=selling_fees, buyer_will_pay=buyer_will_pay,user_active=dict(session))
     else:
         return render_template('403.html')
 
@@ -564,13 +660,13 @@ def edit_dates_event(event_id):
         event = db.session.get(Event, event_id)
         if not event:
             flash('Event not found', 'error')
-            return redirect(url_for('info_event', event_id=event_id, user_active=user_active))
+            return redirect(url_for('info_event', event_id=event_id, user_active=dict(session)))
         data = request.get_json()
         event.event_date = data['start_date'] + ' ' + data['start_time']
         event.event_date_end = data['end_date'] + ' ' + data['end_time']
         db.session.commit()
         flash('Dates updated', 'success')
-        return redirect(url_for('info_event', event_id=event_id, user_active=user_active))
+        return redirect(url_for('info_event', event_id=event_id, user_active=dict(session)))
     else:
         return render_template('403.html')
 
@@ -586,6 +682,20 @@ def edit_status():
             user.is_active = 0
         db.session.commit()
         return redirect(url_for('admin_users'))
+    return render_template('403.html')
+
+@app.route('/admin/admin_users/edit_status', methods=['GET'])
+def edit_status_admin_users():
+    if is_authenticated():
+        user_id = request.args.get('user_id')
+        status = request.args.get('status')
+        user = db.session.get(UserAdmin, user_id)
+        if status == 'true':
+            user.status = 'Active'
+        else:
+            user.status = 'Banned'
+        db.session.commit()
+        return redirect(url_for('users_admin'))
     return render_template('403.html')
 
 @app.route('/admin/tickets/edit_status', methods=['GET'])
@@ -609,14 +719,100 @@ def tickets_edit_status():
 @app.route('/admin/users/create', methods=['POST'])
 def create_user():
     if is_authenticated():
-        print(request.form)
         user = User(name=request.form['name'], email=request.form['email'],
                     password=generate_pass(request.form['password']),
                     is_active=True if request.form['is_active'] == 'true' else False,
-                    phone_number=request.form['phone'])
+                    phone_number=request.form['phone'], node_id=session['node_id'])
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('admin_users'))
+    return render_template('403.html')
+
+
+def generate_password_user(length: int = 8,
+                      use_lower: bool = True,
+                      use_upper: bool = True,
+                      use_digits: bool = True,
+                      use_symbols: bool = True) -> str:
+    """Генератор паролей.
+    length      – длина пароля
+    use_lower   – использовать строчные буквы
+    use_upper   – использовать заглавные буквы
+    use_digits  – использовать цифры
+    use_symbols – использовать спецсимволы
+    """
+
+    alphabet = ""
+    if use_lower:
+        alphabet += string.ascii_lowercase
+    if use_upper:
+        alphabet += string.ascii_uppercase
+    if use_digits:
+        alphabet += string.digits
+    if use_symbols:
+        alphabet += "!@#$%^&*_-+=?."
+
+    if not alphabet:
+        raise ValueError("Нужно выбрать хотя бы один набор символов")
+
+    # гарантируем, что хотя бы по одному символу из каждого выбранного набора
+    required = []
+    if use_lower:
+        required.append(secrets.choice(string.ascii_lowercase))
+    if use_upper:
+        required.append(secrets.choice(string.ascii_uppercase))
+    if use_digits:
+        required.append(secrets.choice(string.digits))
+    if use_symbols:
+        required.append(secrets.choice("!@#$%^&*_-+=?."))
+
+    # остальное добиваем случайными
+    while len(required) < length:
+        required.append(secrets.choice(alphabet))
+
+    # перемешиваем список
+    secrets.SystemRandom().shuffle(required)
+    return "".join(required)
+
+
+def create_user_node(email, role, context_type, node_id):
+    if node_id == '':
+        node_id = str(uuid.uuid4())
+    password_user = generate_password_user(8)
+
+    msg = Message('Welcome to UnieAdmin',
+                  sender='exchangebots@gmail.com',
+                  recipients=[email])
+    msg.body = f'''Your login: {email}
+                            Your password: {password_user}
+                            If you did not make this request then simply ignore this email and no changes will be made.
+                            '''
+    mail.send(msg)
+    user = UserAdmin(email=email, password=generate_password_hash(password_user),
+                     role=role, user_hash='', context_type=context_type,
+                     node_id=node_id, status='Active')
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+@app.route('/admin/nodes/create', methods=['POST'])
+def create_nodes():
+    if is_authenticated():
+        node_gen = str(uuid.uuid4())
+        node = Nodes(organization_name=request.form['org_name'],slug=request.form['slug'],commission=request.form['commission'], node_id=node_gen)
+        db.session.add(node)
+        db.session.commit()
+        create_user_node(request.form['organizer_email'], request.form['role'], request.form['context_type'], node_gen)
+        return redirect(url_for('admin_users'))
+    return render_template('403.html')
+
+@app.route('/admin/user_admin/create', methods=['POST'])
+def create_user_admin():
+    if is_authenticated():
+        print(request.form)
+        create_user_node(request.form['email'], request.form['role'], request.form['context_type'], request.form['node_id'])
+        return redirect(url_for('users_admin'))
     return render_template('403.html')
 
 
@@ -732,7 +928,7 @@ def create_event():
                 file.save(save_path)
                 session['temp_image'] = save_path
                 session['event_cover_path'] = filename
-            return render_template('admin/events_create_step_2.html', user_active=user_active)
+            return render_template('admin/events_create_step_2.html', user_active=dict(session))
         elif request.form.get('step') == 'step_2':
             session['start_date'] = request.form.get('start_date')
             session['start_time'] = request.form.get('start_time')
@@ -741,7 +937,7 @@ def create_event():
             session['venue_name'] = request.form.get('venue_name')
             session['venue_city'] = request.form.get('venue_city')
             session['venue_address'] = request.form.get('venue_address')
-            return render_template('admin/events_create_step_3.html', user_active=user_active)
+            return render_template('admin/events_create_step_3.html', user_active=dict(session))
         elif request.form.get('step') == 'step_3':
             try:
                 genres_str = request.form.get('genres', '')
@@ -770,8 +966,8 @@ def create_event():
                 db.session.commit()
             except Exception as e:
                 print(e)
-                return render_template('admin/events_create_step_3.html', user_active=user_active, show_modal='error')
-            return render_template('admin/events_create_step_3.html', user_active=user_active, show_modal=True)
+                return render_template('admin/events_create_step_3.html', user_active=dict(session), show_modal='error')
+            return render_template('admin/events_create_step_3.html', user_active=dict(session), show_modal=True)
 
     filename = session.get('event_cover_path')
     event_image_url = None
@@ -782,7 +978,7 @@ def create_event():
         else:
             session.pop('event_cover_path')
 
-    return render_template('admin/events_create_step_1.html', event_image_url=event_image_url, user_active=user_active)
+    return render_template('admin/events_create_step_1.html', event_image_url=event_image_url, user_active=dict(session))
 
 
 @app.route('/admin/tickets/create', methods=['POST'])
@@ -809,7 +1005,6 @@ def create_ticket():
     return render_template('403.html')
 
 def attach_images_to_events(events):
-    # Получить все event_id из результатов поиска
     event_ids = [e.id for e in events]
     # Получить карточки-фотки одной пачкой
     photo_card = aliased(EventPhoto)
@@ -843,6 +1038,7 @@ def attach_images_to_events(events):
             event_obj.card_filename = event_obj.page_filename = None
             event_obj.card_ext = event_obj.page_ext = None
     return events
+
 
 @app.route('/admin/events', methods=['GET', 'POST'])
 def admin_events():
@@ -891,7 +1087,7 @@ def admin_events():
                                        events_info=events_info,
                                        current_tab=found_tab,
                                        unpublished_count=unpublished_count,
-                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=user_active)
+                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=dict(session))
             else:
                 # 1. Базовый запрос
                 base_query = (
@@ -941,7 +1137,7 @@ def admin_events():
 
                 return render_template(
                     'admin/events.html',
-                    user_active=user_active,
+                    user_active=dict(session),
                     today=(date.today() + timedelta(days=1)).isoformat(),
                     events_info=events_info,
                     current_tab=tab,
@@ -950,6 +1146,7 @@ def admin_events():
                     total_pages=total_pages
                 )
         else:
+            print(request.form)
             if request.form['action'] == 'add':
                 event = db.session.query(Event).filter_by(id=request.form['event_id']).first()
                 event.status = 'upcoming'
@@ -970,6 +1167,132 @@ def admin_events():
     else:
         return render_template('403.html')
 
+@app.route('/admin/orders', methods=['GET', 'POST'])
+def admin_orders():
+    if is_authenticated():
+        if request.method == 'GET':
+            page = int(request.args.get('page', 1))
+            per_page = 8
+            user_active = session['email_user']
+            photo_card = aliased(EventPhoto)
+            photo_page = aliased(EventPhoto)
+            file_card = aliased(File)
+            file_page = aliased(File)
+            tab = request.args.get('tab', 'unpublished')
+            q = request.args.get('q', '').strip()
+            now = datetime.now()
+            base_query = db.session.query(Event)
+            if q:
+                search = f"%{q.lower()}%"
+                query = base_query.filter(
+                    db.or_(
+                        db.func.lower(Event.name).like(search),
+                        db.cast(Event.id, db.String).like(f"%{q}%")
+                    )
+                )
+                found = query.order_by(Event.event_date).all()
+                # определяем, к какому табу относятся найденные ивенты
+                if not found:
+                    found_tab = None
+                    events_info = []
+                else:
+                    # first event in found — определяем по дате и статусу в какой таб попадает
+                    event = found[0]
+                    if event.status == 'draft':
+                        found_tab = 'unpublished'
+                    elif event.event_date > now:
+                        found_tab = 'upcoming'
+                    else:
+                        found_tab = 'past'
+                    events_info = attach_images_to_events(found)
+                unpublished_count = base_query.filter(Event.status == 'draft').count()
+                # Пагинация вручную
+                total = len(events_info)  # <= Вот это total!
+                events_info = events_info[(page - 1) * per_page: page * per_page]  # Только текущая страница
+                total_pages = math.ceil(total / per_page)
+                return render_template('admin/orders.html',
+                                       events_info=events_info,
+                                       current_tab=found_tab,
+                                       unpublished_count=unpublished_count,
+                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=dict(session))
+            else:
+                # 1. Базовый запрос
+                base_query = (
+                    db.session.query(Event)
+                    .outerjoin(photo_card, (photo_card.event_id == Event.id) & (photo_card.location == 'card'))
+                    .outerjoin(file_card, file_card.id == photo_card.file_id)
+                    .outerjoin(photo_page, (photo_page.event_id == Event.id) & (photo_page.location == 'page'))
+                    .outerjoin(file_page, file_page.id == photo_page.file_id)
+                    .add_columns(
+                        file_card.id.label("card_filename"),
+                        file_page.id.label("page_filename"),
+                        file_card.originalname.label("card_ext"),
+                        file_page.originalname.label("page_ext")
+                    )
+                )
+
+                # 2. Фильтрация по табу
+                if tab == 'upcoming':
+                    base_query = base_query.filter(Event.event_date > now, Event.status != 'draft')
+                elif tab == 'past':
+                    base_query = base_query.filter(Event.event_date_end < now, Event.status != 'draft')
+                elif tab == 'unpublished':
+                    base_query = base_query.filter(Event.status == 'draft')
+
+                # 3. Подсчет общего количества событий
+                total_events = base_query.count()
+                total_pages = (total_events + per_page - 1) // per_page
+
+                # 4. Пагинация
+                events = (
+                    base_query
+                    .order_by(Event.event_date)
+                    .limit(per_page)
+                    .offset((page - 1) * per_page)
+                    .all()
+                )
+
+                events_info = []
+                for event_obj, card_filename, page_filename, card_ext, page_ext in events:
+                    event_obj.card_filename = str(card_filename)
+                    event_obj.page_filename = str(page_filename)
+                    event_obj.card_ext = get_extension(card_ext)
+                    event_obj.page_ext = get_extension(page_ext)
+                    events_info.append(event_obj)
+
+                unpublished_count = db.session.query(Event).filter(Event.status == 'draft').count()
+
+                return render_template(
+                    'admin/orders.html',
+                    user_active=dict(session),
+                    today=(date.today() + timedelta(days=1)).isoformat(),
+                    events_info=events_info,
+                    current_tab=tab,
+                    unpublished_count=unpublished_count,
+                    page=page,
+                    total_pages=total_pages
+                )
+        else:
+            print(request.form)
+            if request.form['action'] == 'add':
+                event = db.session.query(Event).filter_by(id=request.form['event_id']).first()
+                event.status = 'upcoming'
+                db.session.commit()
+                tab = request.args.get('tab', 'upcoming')
+                return redirect(url_for('admin_events', tab=tab))
+            elif request.form['action'] == 'delete':
+                event = db.session.get(Event, request.form['event_id'])
+                db.session.delete(event)
+                #TODO добавить удаление файлов
+                db.session.commit()
+                tab = request.args.get('tab', 'unpublished')
+                return redirect(url_for('admin_events', tab=tab))
+            else:
+                tab = request.args.get('tab', 'upcoming')
+                return redirect(url_for('admin_events', tab=tab))
+
+    else:
+        return render_template('403.html')
 
 @app.route('/admin/tickets', methods=['GET'])
 def admin_tickets():
@@ -994,7 +1317,7 @@ def admin_tickets():
             .all()
         )
 
-        return render_template('admin/tickets.html', user_active=user_active, events_info=events_info,
+        return render_template('admin/tickets.html', user_active=dict(session), events_info=events_info,
                                users_info=users_info, tickets_info=tickets_info)
     else:
         return render_template('403.html')
@@ -1004,7 +1327,7 @@ def admin_tickets():
 def admin_deals():
     if is_authenticated():
         user_active = session['email_user']
-        return render_template('admin/deals.html', user_active=user_active)
+        return render_template('admin/deals.html', user_active=dict(session))
     else:
         return render_template('403.html')
 
@@ -1022,7 +1345,7 @@ def admin_tickets_request():
             .order_by(Ticket.id)
             .all()
         )
-        return render_template('admin/tickets_verification.html', user_active=user_active, tickets_info=tickets_info)
+        return render_template('admin/tickets_verification.html', user_active=dict(session), tickets_info=tickets_info)
     else:
         return render_template('403.html')
 

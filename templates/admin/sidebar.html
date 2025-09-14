@@ -15,7 +15,13 @@
         <h1 class="text-wrapper-3">UnieTicket</h1>
         <div class="frame">
           <div class="div">
+            <button class="button_create_node" data-bs-toggle="modal" data-bs-target="#createNodeModal" style="{% if user_active.get('context_type') != 'root' %}display: none;{% endif %}">
+              <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
+              <div class="frame-6"><span class="text-wrapper-2">Create node</span></div>
+            </button>
+           {% if user_active['role'] != 'qr_scanner' %}
             <ul class="frame-2">
+
               <li class="menu-item {% if request.path.startswith('/admin/stats') %}div-wrapper{% endif %}">
                 <a href="/admin/stats" class="frame-wrapper">
                   <div class="frame-3">
@@ -26,6 +32,41 @@
                   </div>
                 </a>
               </li>
+
+                <li class="menu-item">
+              <details class="users-group" {% if request.path.startswith('/admin/users') or request.path.startswith('/admin/team') %}open{% endif %}>
+                <summary class="frame-wrapper" style="list-style:none; cursor:pointer;">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/users.svg" alt="Users icon" />
+                      <span class="dashboard-2">Users / Permissions & Roles</span>
+                    </div>
+                  </div>
+                </summary>
+                <ul class="submenu" style="padding-left:3px; margin-top:6px;">
+                  <li class="menu-item {% if request.path.startswith('/admin/clients') %}div-wrapper{% endif %}">
+                    <a href="/admin/clients" class="frame-wrapper">
+                      <div class="frame-3">
+                        <div class="frame-4">
+                          <img class="img" src="/static/images/sidebar/key.svg" alt="Permissions icon" />
+                          <span class="dashboard-2">Clients</span>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="menu-item {% if request.path.startswith('/admin/users_admin') %}div-wrapper{% endif %}">
+                    <a href="/admin/users_admin" class="frame-wrapper">
+                      <div class="frame-5">
+                        <div class="frame-4">
+                          <img class="img" src="/static/images/sidebar/calendar-dots.svg" alt="Clients icon" />
+                          <span class="text-wrapper">Admin-users & Roles</span>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </details>
+            </li>
               <li class="menu-item {% if request.path.startswith('/admin/events') %}div-wrapper{% endif %}">
                 <a href="/admin/events" class="frame-wrapper">
                   <div class="frame-5">
@@ -101,6 +142,20 @@
               <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
               <div class="frame-6"><span class="text-wrapper-2">Create event</span></div>
             </button>
+            {% else %}
+             <ul class="frame-2">
+            <li class="menu-item {% if request.path.startswith('/admin/qr_check_in') %}div-wrapper{% endif %}">
+                <a href="/admin/qr_check_in" class="frame-wrapper">
+                  <div class="frame-3">
+                    <div class="frame-4">
+                      <img class="img" src="/static/images/sidebar/qr-code.svg" alt="QR Check-in icon" />
+                      <span class="dashboard-2">QR Check-in</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+             </ul>
+            {% endif %}
           </div>
           <div class="frame-7">
             <ul>
@@ -134,7 +189,7 @@
                         <img src="/static/images/sidebar/avatar_un.svg" alt="User avatar" />
                       </div>
                     </div>
-                    <span class="dashboard-3">{{ user_active }}</span>
+                    <span class="dashboard-3">{{ user_active['email_user'] }}</span>
                   </div>
                   <div class="div-2">
                     <div class="overlap-group-wrapper">
@@ -164,7 +219,181 @@
         </div>
       </nav>
     </div>
+  <div class="modal fade" id="createNodeModal" tabindex="-1" aria-labelledby="createNodeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="createNodeForm" class="modal-content" method="POST" action="/admin/nodes/create">
+      <!-- если используете Flask-WTF -->
+      {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="createNodeModalLabel">Create node</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Organization name (unique) -->
+        <div class="mb-3">
+          <label class="form-label">Organization name</label>
+          <input type="text" class="form-control" id="orgName" name="org_name" required>
+          <div class="form-text">Must be unique.</div>
+          <div class="invalid-feedback">Please enter a unique organization name.</div>
+        </div>
+
+        <!-- Slug (unique) -->
+        <div class="mb-3">
+          <label class="form-label">Slug</label>
+          <input type="text" class="form-control" id="slug" name="slug" required
+                 pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" inputmode="latin"
+                 placeholder="my-org-slug">
+          <div class="form-text">Lowercase, numbers and hyphens only. Must be unique.</div>
+          <div class="invalid-feedback">Slug must be unique and match the format (lowercase, numbers, -).</div>
+        </div>
+
+        <!-- Commission (%) int -->
+        <div class="mb-3">
+          <label class="form-label">Commission (%)</label>
+          <div class="input-group">
+            <input type="number" class="form-control" id="commission" name="commission"
+                   required min="0" max="100" step="1" inputmode="numeric">
+            <span class="input-group-text">%</span>
+          </div>
+          <div class="invalid-feedback">Enter an integer from 0 to 100.</div>
+        </div>
+
+        <!-- Main organizer email -->
+        <div class="mb-3">
+          <label class="form-label">Main organizer email</label>
+          <input type="email" class="form-control" id="organizerEmail" name="organizer_email" required>
+          <div class="invalid-feedback">Enter a valid email.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Role</label>
+          <select class="form-select" id="role" name="role">
+              <option value="organizer">Organizer</option>
+            <option value="admin">Admin</option>
+            <option value="viewer">Viewer</option>
+            <option value="qr_scanner">QR-scanner</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Context type</label>
+          <select class="form-select" id="context_type" name="context_type">
+              <option value="node">Node</option>
+            <option value="root">Root</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast "Node has been created" -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="nodeCreatedToast" class="toast align-items-center text-bg-success border-0" role="status" aria-live="polite" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">Node has been created</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
   </body>
+
+<!-- Modal: Create Node -->
+
+
+<script>
+// --- helpers ---
+const slugify = (s) =>
+  s.toLowerCase()
+   .normalize('NFD').replace(/[\u0300-\u036f]/g,'')   // убрать диакритику
+   .replace(/[^a-z0-9]+/g,'-')
+   .replace(/^-+|-+$/g,'');
+
+// автослаг из имени (если slug пользователь не трогал)
+let userTouchedSlug = false;
+const nameEl = document.getElementById('orgName');
+const slugEl = document.getElementById('slug');
+
+slugEl.addEventListener('input', () => userTouchedSlug = true);
+nameEl.addEventListener('input', () => {
+  if (!userTouchedSlug) slugEl.value = slugify(nameEl.value);
+});
+
+// простая HTML5-валидация + (опционально) AJAX-проверка уникальности
+const form = document.getElementById('createNodeForm');
+form.addEventListener('submit', async (e) => {
+  // HTML5 validity
+  if (!form.checkValidity()) {
+    e.preventDefault();
+    e.stopPropagation();
+    form.classList.add('was-validated');
+    return;
+  }
+
+  // --- OPTIONAL: уникальность на бэке через AJAX перед отправкой формы ---
+  // Ожидается, что эндпоинты вернут JSON вида { "exists": true/false }
+  // Измените URL на свои.
+  try {
+    const [nameChk, slugChk] = await Promise.all([
+      fetch(`/api/nodes/check_name?name=${encodeURIComponent(nameEl.value)}`),
+      fetch(`/api/nodes/check_slug?slug=${encodeURIComponent(slugEl.value)}`)
+    ]);
+    const nameJson = await nameChk.json();
+    const slugJson = await slugChk.json();
+
+    if (nameJson.exists || slugJson.exists) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (nameJson.exists) {
+        nameEl.classList.add('is-invalid');
+      } else {
+        nameEl.classList.remove('is-invalid');
+      }
+      if (slugJson.exists) {
+        slugEl.classList.add('is-invalid');
+      } else {
+        slugEl.classList.remove('is-invalid');
+      }
+      return;
+    }
+  } catch (err) {
+    // если проверка упала — даём форме отправиться обычным путём
+    console.warn('Uniq check failed:', err);
+  }
+
+  // если хотите отправлять AJAX-ом и показывать toast без перезагрузки:
+  // --- UNCOMMENT блок ниже и уберите action/method у формы ---
+  /*
+  e.preventDefault();
+  const payload = {
+    org_name: nameEl.value,
+    slug: slugEl.value,
+    commission: parseInt(document.getElementById('commission').value, 10),
+    organizer_email: document.getElementById('organizerEmail').value
+  };
+  const resp = await fetch('/admin/nodes/create', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if (resp.ok) {
+    bootstrap.Modal.getInstance(document.getElementById('createNodeModal')).hide();
+    new bootstrap.Toast(document.getElementById('nodeCreatedToast')).show();
+    // TODO: обновить список нод/таблицу
+  } else {
+    alert('Failed to create node');
+  }
+  */
+});
+</script>
 <script>
         function confirmLogout(e) {
             e.preventDefault(); // Отменяем стандартное поведение ссылки
