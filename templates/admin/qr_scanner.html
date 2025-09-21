@@ -1,41 +1,94 @@
-<!doctype html>
-<html lang="ru">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>QR Scanner</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- CDN библиотеки -->
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style_events.css"/>
+
   <script src="https://unpkg.com/html5-qrcode" defer></script>
-  <style>
-    body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:20px;}
+</head>
+<style>
+
     #reader{width: 420px; max-width: 100%;}
     .row{display:flex; gap:16px; flex-wrap:wrap; align-items:flex-start}
     .card{border:1px solid #e5e5e5; border-radius:8px; padding:12px}
     .muted{color:#666; font-size:14px}
     .ok{color:#0a7f3f; font-weight:600}
     .err{color:#a00; font-weight:600}
-    button{padding:8px 12px; border-radius:6px; border:1px solid #ddd; cursor:pointer}
-  </style>
-</head>
+    :root {
+        --font-ui: 'Instrument Sans', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        --font-heading: 'Raleway', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    }
+
+    /* По умолчанию — Instrument Sans */
+    body {
+        font-family: var(--font-ui);
+    }
+
+    /* Заголовки и лейблы из макета на Raleway */
+    h1, h2, h3, h4,
+    .title, /* Orders */
+    .event-title, /* Into the dark... */
+    .label, .at-label /* “at Ankali, Prague”, “Sold” и т.п. */
+    {
+        font-family: var(--font-heading);
+    }
+
+
+    body {
+        font-family: system-ui;
+    }
+
+
+
+    .page-content {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+
+
+    .title {
+        color: #000000;
+        font-size: 32px;
+        font-weight: bold;
+    }
+
+
+</style>
 <body>
-  <h1>QR-сканер</h1>
+<div class="desktop-event-list">
+    {% include 'admin/sidebar.html' %}
+    <main class="frame-11">
+
+        <div class="page-content">
+						<span class="title">
+							QR scanner
+						</span>
   <div class="row">
     <div class="card">
-      <!-- Виджет камеры + загрузка файлов -->
       <div id="reader"></div>
       <div style="margin-top:8px; display:flex; gap:8px;">
-        <button id="btn-start">Старт</button>
-        <button id="btn-stop">Стоп</button>
+        <button id="btn-start" class="button-qr">Start</button>
+        <button id="btn-stop" class="button-qr">Stop</button>
       </div>
     </div>
 
     <div class="card" style="min-width:280px;">
-      <div><strong>Результат:</strong></div>
+      <div><strong>Result:</strong></div>
       <pre id="result" style="white-space:pre-wrap;word-break:break-word;"></pre>
       <div id="status" class="muted"></div>
     </div>
   </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let html5Qrcode;     // экземпляр сканера
     let isRunning = false;
@@ -116,11 +169,249 @@
     btnStop .addEventListener("click", stopScanner);
 
     // Автостарт на десктопе/мобиле по готовности скрипта
-    window.addEventListener("load", () => {
-      // Не автостартуем в iOS без пользовательского жеста, чтобы не ловить отказ
-      const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (!isiOS) startScanner();
-    });
+    // window.addEventListener("load", () => {
+    //   // Не автостартуем в iOS без пользовательского жеста, чтобы не ловить отказ
+    //   const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    //   if (!isiOS) startScanner();
+    // });
   </script>
+
+
+        </div>
+    </main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/intlTelInput.min.js"></script>
+<!-- Подключение Bootstrap JS и Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script>
+    (function () {
+        const input = document.getElementById('search-event');
+        const clear = document.getElementById('clearSearch');
+        const url = new URL(window.location.href);
+
+        const pageOrQueryActive = () => url.searchParams.has('q') || url.searchParams.has('page');
+        const toggle = () => {
+            if (input.value.trim() || pageOrQueryActive()) {
+                clear.classList.add('is-visible');
+            } else {
+                clear.classList.remove('is-visible');
+            }
+        };
+
+        input.addEventListener('input', toggle);
+
+        clear.addEventListener('click', () => {
+            input.value = '';
+            // чистим q и page из URL и перезагружаем
+            const u = new URL(window.location.href);
+            u.searchParams.delete('q');
+            u.searchParams.delete('page');
+            window.location.href = u.pathname + (u.searchParams.toString() ? '?' + u.searchParams.toString() : '');
+        });
+
+        toggle();
+    })();
+</script>
+<script>
+    function confirmBlock(event, url) {
+        const isBlocking = url.includes("status=false");
+
+        const message = isBlocking
+            ? "Вы уверены, что хотите заблокировать этого пользователя?"
+            : "Вы уверены, что хотите разблокировать этого пользователя?";
+
+        if (confirm(message)) {
+            window.location.href = url;
+        } else {
+            event.preventDefault();
+        }
+    }
+
+    function searchTable() {
+        var input, filter, table, tr, td, i, j, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toLowerCase();
+        table = document.getElementById("clientsTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 1; i < tr.length; i++) { // Начинаем с 1, чтобы пропустить заголовок
+            tr[i].style.display = "none"; // Сначала скрываем строку
+            td = tr[i].getElementsByTagName("td");
+            for (j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        tr[i].style.display = ""; // Показываем строку, если совпадает
+                        break; // Если найдено совпадение, выходим из внутреннего цикла
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+        var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+            return new bootstrap.Dropdown(dropdownToggleEl)
+        })
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categorySelect = document.getElementById('categorySelect');
+
+        function applyFilters() {
+            const rows = document.querySelectorAll('#clientsTable tbody tr');
+            const selectedCategory = categorySelect.value;
+
+            rows.forEach(row => {
+                const category = row.cells[6].textContent;
+                const matchesCategory = !selectedCategory || category === selectedCategory;
+
+                row.style.display = matchesCategory ? '' : 'none';
+            });
+        }
+
+        categorySelect.addEventListener('change', applyFilters);
+    });
+</script>
+<script>
+    function openEditModal(id, name, email, password, phone) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPassword').value = password;
+
+        if (itiEdit && phone) {
+            itiEdit.setNumber(phone); // Предзаполнить номер с кодом
+            document.getElementById("full_phone").value = itiEdit.getNumber();
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+
+        document.getElementById('editUserForm').action = `/admin/users/edit/${id}`;
+    }
+</script>
+<script>
+    function openCreateModal(id, name, email) {
+        document.getElementById('editUserId').value = id;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+
+
+        const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        modal.show();
+
+        // Задать action формы, если надо:
+        document.getElementById('editUserForm').action = `/admin/users/edit/${id}`;
+    }
+</script>
+<script>
+    function openCreateModal() {
+        // Очистим поля при открытии
+        document.getElementById('createName').value = '';
+        document.getElementById('createEmail').value = '';
+        document.getElementById('createPassword').value = '';
+
+
+        const modal = new bootstrap.Modal(document.getElementById('createUserModal'));
+        modal.show();
+    }
+</script>
+<script>
+    const searchInput = document.getElementById('search-event');
+
+    searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            doSearch();
+        }
+    });
+
+    searchInput.addEventListener('blur', function () {
+        doSearch();
+    });
+
+    function doSearch() {
+        let q = searchInput.value;
+        let params = new URLSearchParams(window.location.search);
+        params.set('q', q);
+        params.set('page', 1);
+        window.location.search = params.toString();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const clearBtn = document.getElementById('clear-search');
+        // показать кнопку, если есть текст (например, после поиска)
+        if (searchInput && clearBtn) {
+            if (searchInput.value) {
+                clearBtn.style.display = 'block';
+            }
+            // по инпуту тоже управляем видимостью
+            searchInput.addEventListener('input', function () {
+                clearBtn.style.display = this.value ? 'block' : 'none';
+            });
+            clearBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                // searchInput.focus();
+                window.location = '/admin/events?tab=unpublished'
+            });
+        }
+    });
+</script>
+<script>
+    let itiCreate, itiEdit;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // инициализация для формы СОЗДАНИЯ
+        const createInput = document.getElementById("phone");
+        if (createInput) {
+            itiCreate = window.intlTelInput(createInput, {
+                initialCountry: "auto",
+                geoIpLookup: callback => {
+                    fetch('https://ipapi.co/json')
+                        .then(res => res.json())
+                        .then(data => callback(data.country_code))
+                        .catch(() => callback('us'));
+                },
+                preferredCountries: ["cz", "ru", "ua"],
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+            });
+
+            createInput.addEventListener('input', () => {
+                const placeholder = createInput.getAttribute("placeholder");
+                const maxLength = placeholder.replace(/\D/g, '').length;
+                const currentDigits = createInput.value.replace(/\D/g, '');
+                if (currentDigits.length > maxLength) {
+                    createInput.value = currentDigits.slice(0, maxLength);
+                }
+                console.log(itiCreate.getNumber())
+                document.getElementById("full_phone_create").value = itiCreate.getNumber();
+            });
+        }
+
+        // инициализация для формы РЕДАКТИРОВАНИЯ
+        const editInput = document.getElementById("editPhone");
+        if (editInput) {
+            itiEdit = window.intlTelInput(editInput, {
+                preferredCountries: ["cz", "ru", "ua"],
+                utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.1.1/build/js/utils.js"
+            });
+
+            editInput.addEventListener('input', () => {
+                const placeholder = editInput.getAttribute("placeholder");
+                const maxLength = placeholder.replace(/\D/g, '').length;
+                const currentDigits = editInput.value.replace(/\D/g, '');
+                if (currentDigits.length > maxLength) {
+                    editInput.value = currentDigits.slice(0, maxLength);
+                }
+                document.getElementById("full_phone").value = itiEdit.getNumber();
+            });
+        }
+    });
+</script>
 </body>
 </html>

@@ -3,10 +3,12 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
-
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="/static/css/globals.css" />
     <link rel="stylesheet" href="/static/css/styleguide.css" />
     <link rel="stylesheet" href="/static/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;600;700&family=Raleway:wght@700&display=swap" rel="stylesheet">
+
     <title>UnieTicket - Events</title>
   </head>
   <body>
@@ -19,125 +21,95 @@
               <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
               <div class="frame-6"><span class="text-wrapper-2">Create node</span></div>
             </button>
+
            {% if user_active['role'] != 'qr_scanner' %}
-            <ul class="frame-2">
+            {% set parts = request.path.strip('/').split('/') %}
+            {% set section = parts[1] if parts|length > 1 else '' %}
+ <div class="sidebar-scroll">
+<ul class="frame-2">
 
-              <li class="menu-item {% if request.path.startswith('/admin/stats') %}div-wrapper{% endif %}">
-                <a href="/admin/stats" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/house.svg" alt="Home icon" />
-                      <span class="dashboard">Home</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
+  <li class="menu-item">
+    <a href="/admin/stats" class="menu-link {% if request.path.startswith('/admin/stats') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/house.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Home</span>
+    </a>
+  </li>
 
-                <li class="menu-item">
-              <details class="users-group" {% if request.path.startswith('/admin/users') or request.path.startswith('/admin/team') %}open{% endif %}>
-                <summary class="frame-wrapper" style="list-style:none; cursor:pointer;">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/users.svg" alt="Users icon" />
-                      <span class="dashboard-2">Users / Permissions & Roles</span>
-                    </div>
-                  </div>
-                </summary>
-                <ul class="submenu" style="padding-left:3px; margin-top:6px;">
-                  <li class="menu-item {% if request.path.startswith('/admin/clients') %}div-wrapper{% endif %}">
-                    <a href="/admin/clients" class="frame-wrapper">
-                      <div class="frame-3">
-                        <div class="frame-4">
-                          <img class="img" src="/static/images/sidebar/key.svg" alt="Permissions icon" />
-                          <span class="dashboard-2">Clients</span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                  <li class="menu-item {% if request.path.startswith('/admin/users_admin') %}div-wrapper{% endif %}">
-                    <a href="/admin/users_admin" class="frame-wrapper">
-                      <div class="frame-5">
-                        <div class="frame-4">
-                          <img class="img" src="/static/images/sidebar/calendar-dots.svg" alt="Clients icon" />
-                          <span class="text-wrapper">Admin-users & Roles</span>
-                        </div>
-                      </div>
-                    </a>
-                  </li>
-                </ul>
-              </details>
-            </li>
-              <li class="menu-item {% if request.path.startswith('/admin/events') %}div-wrapper{% endif %}">
-                <a href="/admin/events" class="frame-wrapper">
-                  <div class="frame-5">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/calendar-dots.svg" alt="Events icon" />
-                      <span class="text-wrapper">Events</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item {% if request.path.startswith('/admin/orders') %}div-wrapper{% endif %}">
-                <a href="/admin/orders" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/shopping-cart-simple.svg" alt="Orders icon" />
-                      <span class="dashboard-2">Orders</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item {% if request.path.startswith('/admin/attendees') %}div-wrapper{% endif %}">
-                <a href="/admin/attendees" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/users.svg" alt="Attendees icon" />
-                      <span class="dashboard-2">Attendees</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item {% if request.path.startswith('/admin/finance') %}div-wrapper{% endif %}">
-                <a href="/admin/finance" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/wallet.svg" alt="Finance icon" />
-                      <span class="dashboard-2">Finance</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item {% if request.path.startswith('/admin/support') %}div-wrapper{% endif %}">
-                <a href="/admin/support" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/chats.svg" alt="Support icon" />
-                      <span class="dashboard-2">Support</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item-2 {% if request.path.startswith('/admin/team') %}div-wrapper{% endif %}">
-                <a href="/admin/team" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/key.svg" alt="Team icon" />
-                      <span class="dashboard-2">Team</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-              <li class="menu-item {% if request.path.startswith('/admin/qr_check_in') %}div-wrapper{% endif %}">
-                <a href="/admin/qr_check_in" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/qr-code.svg" alt="QR Check-in icon" />
-                      <span class="dashboard-2">QR Check-in</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
-            </ul>
+  <li class="menu-item">
+    <details class="users-group" {% if section in ['users_admin','clients'] %}open{% endif %}>
+      <summary class="menu-link">
+        <span class="menu-icon" style="--icon-url:url('/static/images/sidebar/users.svg');" aria-hidden="true"></span>
+        <span class="menu-text">Users / Permissions &amp; Roles</span>
+      </summary>
+
+      <ul class="submenu">
+        <li class="menu-item">
+          <a href="/admin/clients" class="menu-link {% if request.path.startswith('/admin/clients') %}is-active{% endif %}">
+            <span class="menu-icon" style="--icon-url:url('/static/images/sidebar/key.svg');" aria-hidden="true"></span>
+            <span class="menu-text">Clients</span>
+          </a>
+        </li>
+
+        <li class="menu-item">
+          <a href="/admin/users_admin" class="menu-link {% if request.path.startswith('/admin/users_admin') %}is-active{% endif %}">
+            <span class="menu-icon" style="--icon-url:url('/static/images/sidebar/calendar-dots.svg');" aria-hidden="true"></span>
+            <span class="menu-text">Admin-users &amp; Roles</span>
+          </a>
+        </li>
+      </ul>
+    </details>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/events" class="menu-link {% if request.path.startswith('/admin/events') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/calendar-dots.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Events</span>
+    </a>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/orders" class="menu-link {% if request.path.startswith('/admin/orders') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/shopping-cart-simple.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Orders</span>
+    </a>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/attendees" class="menu-link {% if request.path.startswith('/admin/attendees') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/users.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Attendees</span>
+    </a>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/finance" class="menu-link {% if request.path.startswith('/admin/finance') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/wallet.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Finance</span>
+    </a>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/support" class="menu-link {% if request.path.startswith('/admin/support') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/chats.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Support</span>
+    </a>
+  </li>
+
+  <li class="menu-item">
+    <a href="/admin/team" class="menu-link {% if request.path.startswith('/admin/team') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/key.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Team</span>
+    </a>
+  </li>
+
+  <li class="menu-item" style="padding-bottom: 10px;">
+    <a href="/admin/qr_check_in" class="menu-link {% if request.path.startswith('/admin/qr_check_in') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/qr-code.svg');" aria-hidden="true"></span>
+      <span class="menu-text">QR Check-in</span>
+    </a>
+  </li>
+
+</ul>
             {% if user_active['role'] != 'viewer' %}
             <button class="button" aria-label="Create event" onclick="window.location.href='{{ url_for('create_event') }}'">
               <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
@@ -146,14 +118,10 @@
             {% endif %}
             {% else %}
              <ul class="frame-2">
-            <li class="menu-item {% if request.path.startswith('/admin/qr_check_in') %}div-wrapper{% endif %}">
-                <a href="/admin/qr_check_in" class="frame-wrapper">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/qr-code.svg" alt="QR Check-in icon" />
-                      <span class="dashboard-2">QR Check-in</span>
-                    </div>
-                  </div>
+              <li class="menu-item">
+                <a href="/admin/qr_check_in" class="menu-link {% if request.path.startswith('/admin/qr_check_in') %}is-active{% endif %}">
+                  <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/qr-code.svg');" aria-hidden="true"></span>
+                  <span class="menu-text">QR Check-in</span>
                 </a>
               </li>
              </ul>
@@ -161,64 +129,40 @@
           </div>
           <div class="frame-7">
             <ul>
-              <li class="menu-item-3 {% if request.path.startswith('/admin/help') %}div-wrapper{% endif %}">
-                <a href="/admin/help" class="frame-8">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/question.svg" alt="Help icon" />
-                      <span class="dashboard-2">Help</span>
-                    </div>
-                  </div>
+                <li class="menu-item" style="padding-bottom: 10px;">
+    <a href="/admin/help" class="menu-link {% if request.path.startswith('/admin/help') %}is-active{% endif %}">
+      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/question.svg');" aria-hidden="true"></span>
+      <span class="menu-text">Help</span>
+    </a>
+  </li>
+
+                <li class="menu-item">
+                <a href="/admin/settings" class="menu-link {% if request.path.startswith('/admin/settings') %}is-active{% endif %}">
+                  <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/gear-six.svg');" aria-hidden="true"></span>
+                  <span class="menu-text">Settings</span>
                 </a>
               </li>
-              <li class="menu-item-3 {% if request.path.startswith('/admin/settings') %}div-wrapper{% endif %}">
-                <a href="/admin/settings" class="frame-8">
-                  <div class="frame-3">
-                    <div class="frame-4">
-                      <img class="img" src="/static/images/sidebar/gear-six.svg" alt="Settings icon" />
-                      <span class="dashboard-2">Settings</span>
-                    </div>
-                  </div>
-                </a>
-              </li>
+
             </ul>
-            <div class="menu-item-4">
-              <div class="frame-wrapper">
-                <div class="frame-9">
-                  <div class="frame-10">
-                    <div class="group">
-                      <div class="overlap-group">
-                        <img src="/static/images/sidebar/avatar_un.svg" alt="User avatar" />
-                      </div>
-                    </div>
-                    <span class="dashboard-3">{{ user_active['email_user'] }}</span>
-                  </div>
-                  <div class="div-2">
-                    <div class="overlap-group-wrapper">
-                      <div class="overlap-group-2" style="margin-left: 1%">
-                        <button
-							  type="button"
-							  style="
-								background: none;
-								border: none;
-								padding: 0;
-								margin: 0;
-								cursor: pointer;
-								outline: none;
-							  "
-							   onclick="confirmLogout(event)"
-							  aria-label="Назад"
-							>
-							  <img src="/static/images/sidebar/exit.svg" alt="Back" draggable="false" style="display: block;" />
-							</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div class="sidebar-user">
+    <span class="sidebar-user__avatar menu-icon"
+          style="--icon-url:url('/static/images/sidebar/avatar.svg');"
+          aria-hidden="true"></span>
+
+    <span class="sidebar-user__email">{{ user_active['email_user'] }}</span>
+
+    <button type="button"
+            class="icon-btn sidebar-user__logout"
+            aria-label="Log out"
+            title="Log out"
+            onclick="confirmLogout(event)">
+      <span class="menu-icon"
+            style="--icon-url:url('/static/images/sidebar/exit.svg');"
+            aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
           </div>
-        </div>
       </nav>
     </div>
   <div class="modal fade" id="createNodeModal" tabindex="-1" aria-labelledby="createNodeModalLabel" aria-hidden="true">
@@ -273,7 +217,7 @@
           <label class="form-label">Role</label>
           <select class="form-select" id="role" name="role">
               <option value="organizer">Organizer</option>
-            <option value="admin">Admin</option>
+            <option value="admin">Admin - only root</option>
             <option value="viewer">Viewer</option>
             <option value="qr_scanner">QR-scanner</option>
           </select>
@@ -281,10 +225,7 @@
 
         <div class="mb-3">
           <label class="form-label">Context type</label>
-          <select class="form-select" id="context_type" name="context_type">
-              <option value="node">Node</option>
-            <option value="root">Root</option>
-          </select>
+          <input type="text" class="form-control" id="context_type" name="context_type" value="node" readonly>
         </div>
       </div>
 
@@ -305,9 +246,49 @@
     </div>
   </div>
 </div>
+
+  <form id="logout-form" action="/admin/logout" method="POST" style="display:none;">
+  {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+</form>
+
+<!-- модалка -->
+<div id="logout-overlay" class="logout-overlay" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+  <div class="logout-modal">
+    <button class="logout-close" type="button" aria-label="Close" onclick="closeLogoutModal()">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="#777" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <h3 class="logout-title" id="logout-title">Log out?</h3>
+    <p class="logout-desc">Are you sure you want to leave your account? You’ll need to sign in again.</p>
+
+    <div class="logout-actions">
+      <button type="button" class="btn btn-accent" onclick="closeLogoutModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" onclick="confirmLogoutSubmit()">Log out</button>
+    </div>
+  </div>
+</div>
   </body>
 
+<script>
+  const roleSelect = document.getElementById("role");
+  const contextInput = document.getElementById("context_type");
 
+  function updateContextType() {
+    if (roleSelect.value === "admin") {
+      contextInput.value = "root";
+      contextInput.textContent = "root";
+    } else {
+      contextInput.value = "node";
+      contextInput.textContent = "node";
+    }
+  }
+
+  // при загрузке страницы выставляем правильное значение
+  updateContextType();
+
+  // при изменении роли обновляем отображение
+  roleSelect.addEventListener("change", updateContextType);
+</script>
 <script>
 
 const slugify = (s) =>
@@ -368,20 +349,33 @@ form.addEventListener('submit', async (e) => {
 });
 </script>
 <script>
-        function confirmLogout(e) {
-            e.preventDefault(); // Отменяем стандартное поведение ссылки
-            if (confirm('Выйти из учетной записи?')) {
-                // Если пользователь подтвердил, переходим на URL для выхода
-                window.location.href = '/admin/logout';
-            }
-        }
-        function selectMenuItem(el) {
-        // Снимаем класс со всех
-        document.querySelectorAll('.menu-item').forEach(item => {
-          item.classList.remove('div-wrapper');
-        });
-        // Добавляем выбранному
-        el.classList.add('div-wrapper');
-      }
-    </script>
+  function confirmLogout(e){
+    if(e) e.preventDefault();
+    const ov = document.getElementById('logout-overlay');
+    ov.style.display = 'flex';
+    // фокус внутрь
+    setTimeout(() => { ov.querySelector('.btn-danger').focus(); }, 0);
+    // esc/клик снаружи
+    document.addEventListener('keydown', escHandler);
+    ov.addEventListener('mousedown', outsideHandler);
+  }
+
+  function closeLogoutModal(){
+    const ov = document.getElementById('logout-overlay');
+    ov.style.display = 'none';
+    document.removeEventListener('keydown', escHandler);
+    ov.removeEventListener('mousedown', outsideHandler);
+  }
+
+  function escHandler(e){ if(e.key === 'Escape') closeLogoutModal(); }
+  function outsideHandler(e){
+    const card = document.querySelector('.logout-modal');
+    if(!card.contains(e.target)) closeLogoutModal();
+  }
+
+  function confirmLogoutSubmit(){
+    // если нужен GET: window.location.href = '/logout';
+    document.getElementById('logout-form').submit();
+  }
+</script>
 </html>

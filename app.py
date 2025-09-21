@@ -7,7 +7,8 @@ import uuid
 from datetime import datetime, date, timedelta
 import boto3
 from flask import Flask, session, redirect, url_for, request, render_template, current_app, flash, abort
-from sqlalchemy import VARCHAR, TEXT, DECIMAL, UUID
+from flask_apscheduler import APScheduler
+from sqlalchemy import VARCHAR, TEXT, DECIMAL, UUID, func
 from itsdangerous import Serializer, BadSignature, SignatureExpired
 from flask_mail import Mail, Message
 from sqlalchemy.orm import aliased, joinedload
@@ -41,6 +42,9 @@ app.config['MAIL_USE_SSL'] = True
 app.config['SECURITY_PASSWORD_SALT'] = 'brhgvxncraffbceq'
 
 mail = Mail(app)
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 
 s3 = boto3.client(
     "s3",
@@ -231,7 +235,16 @@ class Nodes(db.Model):
     node_id = db.Column(db.String(36))
     registration_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+@scheduler.task('interval', id='events_status_autoupdate', minutes=5)
+def update_event_statuses():
+    with app.app_context():
+        #в 'past', где закончилось
+        db.session.query(Event).filter(
+            Event.event_date_end < func.now(),
+            ~Event.status.in_(['completed', 'draft', 'cancelled'])
+        ).update({Event.status: 'completed'}, synchronize_session=False)
 
+        db.session.commit()
 
 
 @app.context_processor
@@ -271,9 +284,10 @@ def is_authenticated():
     return 'user_id' in session
 
 
-@app.route('/admin/logout')
+
+@app.route('/admin/logout', methods=['POST'])
 def logout():
-    session.pop('user_id', None)  # Удалить user_id из сессии, если он там есть
+    session.pop('user_id', None)
     return redirect(url_for('admin_login'))
 
 
@@ -386,16 +400,53 @@ def reset_password(token):
 @app.route('/admin/stats')
 def stats():
     if is_authenticated():
-        user_active = session['email_user']
         return render_template('admin/stats.html', user_active=dict(session))
     return render_template('403.html')
 
+@app.route('/admin/attendees')
+def attendees():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
+
+
+@app.route('/admin/finance')
+def finance():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
+
+
+@app.route('/admin/support')
+def support():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
+
+@app.route('/admin/help')
+def help():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
+
+
+@app.route('/admin/settings')
+def settings():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
+
+@app.route('/admin/team')
+def team():
+    if is_authenticated():
+        return render_template('admin/stats.html', user_active=dict(session))
+    return render_template('403.html')
 
 @app.route('/admin/clients', methods=['GET'])
 def admin_users():
     if is_authenticated():
         page = int(request.args.get('page', 1))
-        per_page = 12
+        per_page = 10
         if session['context_type'] == 'root':
 
             users_info = (
@@ -440,7 +491,7 @@ def admin_users():
 def users_admin():
     if is_authenticated():
         page = int(request.args.get('page', 1))
-        per_page = 12
+        per_page = 10
         if session['context_type'] == 'root':
             nodes = []
             nodes_info = db.session.query(Nodes).all()
@@ -894,33 +945,6 @@ def get_extension(filename):
     return ''
 
 
-# @app.route('/admin/events/create', methods=['POST'])
-# def create_event():
-#     print(request.form)
-#     if is_authenticated():
-#         event = Event(name=request.form['name'], genre=request.form['genre_id'],
-#                       event_date=request.form['event_date'], location=request.form['location'],
-#                       description=request.form['description'],event_date_end=request.form['event_end_date'],location_address=request.form['location_address'],city=request.form['city'])
-#         db.session.add(event)
-#         db.session.commit()
-#         event_id = event.id
-#
-#         # Получаем файлы
-#         photo_card = request.files.get('photo_card')
-#         photo_page = request.files.get('photo_page')
-#
-#         # Загружаем, если они действительно есть
-#         if photo_card and photo_card.filename:
-#             photo_card_id = upload_file(photo_card, 'media')
-#             db.session.add(EventPhoto(event_id=event_id, file_id=photo_card_id, location='card'))
-#
-#         if photo_page and photo_page.filename:
-#             photo_page_id = upload_file(photo_page, 'media')
-#             db.session.add(EventPhoto(event_id=event_id, file_id=photo_page_id, location='page'))
-#         db.session.commit()
-#         return redirect(url_for('admin_events'))
-#     return render_template('403.html')
-
 @app.route('/admin/events/cancel', methods=['GET', 'POST'])
 def cancel_event_creation():
     image_filename = session.pop('temp_image', None)  # или другой ключ
@@ -949,6 +973,9 @@ def create_event():
                 file.save(save_path)
                 session['temp_image'] = save_path
                 session['event_cover_path'] = filename
+            genres_str = request.form.get('genres', '')
+            genres_list = [g.strip() for g in genres_str.split(',') if g.strip()]
+            session['genres_list'] = genres_list
             return render_template('admin/events_create_step_2.html', user_active=dict(session))
         elif request.form.get('step') == 'step_2':
             session['start_date'] = request.form.get('start_date')
@@ -958,17 +985,18 @@ def create_event():
             session['venue_name'] = request.form.get('venue_name')
             session['venue_city'] = request.form.get('venue_city')
             session['venue_address'] = request.form.get('venue_address')
+
             return render_template('admin/events_create_step_3.html', user_active=dict(session))
         elif request.form.get('step') == 'step_3':
             try:
-                genres_str = request.form.get('genres', '')
+
                 available_quantity_tickets = request.form.get('available_quantity')
                 price = request.form.get('price')
                 last_updated = datetime.now()
-                genres_list = [g.strip() for g in genres_str.split(',') if g.strip()]
+
                 start_dt = f"{session['start_date']} {session['start_time']}"
                 end_dt = f"{session['end_date']} {session['end_time']}"
-                event = Event(name=session['event_name'], genre=genres_list,tickets_available=available_quantity_tickets,price_tickets=price,
+                event = Event(name=session['event_name'], genre=session['genres_list'],tickets_available=available_quantity_tickets,price_tickets=price,
                               event_date=start_dt, location=session['venue_name'],
                               description=session['event_desc'],event_date_end=end_dt,location_address=session['venue_address'],city=session['venue_city'],last_edit=last_updated, node_id=session['node_id'])
                 db.session.add(event)
@@ -998,8 +1026,12 @@ def create_event():
             event_image_url = '/static/tmp/' + filename
         else:
             session.pop('event_cover_path')
+    genre_all = db.session.query(Genre).all()
+    genre_all_list = []
+    for genre in genre_all:
+        genre_all_list.append(genre.name)
 
-    return render_template('admin/events_create_step_1.html', event_image_url=event_image_url, user_active=dict(session))
+    return render_template('admin/events_create_step_1.html', event_image_url=event_image_url, user_active=dict(session), genre_all_list=genre_all_list)
 
 
 @app.route('/admin/tickets/create', methods=['POST'])
@@ -1071,6 +1103,7 @@ def admin_events():
             photo_page = aliased(EventPhoto)
             file_card = aliased(File)
             file_page = aliased(File)
+            modal_success = request.args.get('modal_success', '').lower()
             tab = request.args.get('tab', 'unpublished')
             q = request.args.get('q', '').strip()
             now = datetime.now()
@@ -1110,7 +1143,7 @@ def admin_events():
                                        events_info=events_info,
                                        current_tab=found_tab,
                                        unpublished_count=unpublished_count,
-                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=dict(session))
+                                       q=q, total_pages=total_pages, page=page, per_page=per_page,user_active=dict(session), modal_success=modal_success)
             else:
                 if session['context_type'] == 'root':
                     base_query = (
@@ -1181,7 +1214,7 @@ def admin_events():
                     current_tab=tab,
                     unpublished_count=unpublished_count,
                     page=page,
-                    total_pages=total_pages
+                    total_pages=total_pages, modal_success=modal_success
                 )
         else:
             if request.form['action'] == 'add':
@@ -1189,7 +1222,7 @@ def admin_events():
                 event.status = 'upcoming'
                 db.session.commit()
                 tab = request.args.get('tab', 'upcoming')
-                return redirect(url_for('admin_events', tab=tab))
+                return redirect(url_for('admin_events', tab=tab, modal_success=str(request.form['event_id'])))
             elif request.form['action'] == 'delete':
                 event = db.session.get(Event, request.form['event_id'])
                 db.session.delete(event)
@@ -1395,4 +1428,4 @@ def admin_tickets_request():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5050, debug=True)
+    app.run(host='0.0.0.0', port=8050, debug=True)

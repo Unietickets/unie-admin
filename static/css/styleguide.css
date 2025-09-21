@@ -85,9 +85,9 @@
   --typography-XL-strong-font-style: normal;
   --corner-shadow: 5px -2px 14.5px 0px rgba(105, 105, 105, 0.15);
   --drop-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.1);
-  --colors-electric-violet-50: rgba(242, 242, 255, 1);
+  --colors-electric-violet-50: rgb(61, 61, 61);
   --colors-electric-violet-100: rgba(233, 231, 255, 1);
-  --colors-electric-violet-200: rgba(212, 210, 255, 1);
+  --colors-electric-violet-200: rgb(61, 61, 61);
   --colors-electric-violet-300: rgba(181, 174, 255, 1);
   --colors-electric-violet-400: rgba(144, 128, 255, 1);
   --colors-electric-violet-500: rgba(109, 77, 255, 1);
@@ -95,7 +95,7 @@
   --colors-electric-violet-700: rgba(77, 22, 235, 1);
   --colors-electric-violet-800: rgba(64, 18, 197, 1);
   --colors-electric-violet-900: rgba(54, 17, 161, 1);
-  --colors-electric-violet-950: rgba(29, 7, 110, 1);
+  --colors-electric-violet-950: rgb(62, 60, 46);
   --colors-grey-50: rgba(250, 250, 250, 1);
   --colors-grey-100: rgba(239, 239, 239, 1);
   --colors-grey-200: rgba(220, 220, 220, 1);
@@ -151,4 +151,584 @@
   --colors-coral-red-800: rgba(153, 27, 27, 1);
   --colors-coral-red-900: rgba(127, 29, 29, 1);
   --colors-coral-red-950: rgba(69, 10, 10, 1);
+   --sb-item-h: 44px;      /* высота пункта */
+  --sb-item-px: 16px;     /* горизонтальные отступы */
+  --sb-item-gap: 16px;    /* расстояние между иконкой и текстом */
+  --sb-item-radius: 8px;  /* скругление */
+  --sb-extra: 48px;
+  --ut-accent: #FFE35F;
+  --ut-bg: #fff;
+  --ut-shadow: 0 20px 60px rgba(0,0,0,.15);
+  --ut-radius: 12px;
+  --ut-font: "Instrument Sans", system-ui, sans-serif;
 }
+.sidebar-user{
+  display:flex; align-items:center; gap:12px;
+  height: var(--sb-item-h, 44px);
+  border-radius: var(--sb-item-radius, 8px);
+  background:#292929; color:#fff;
+  box-sizing: border-box;
+}
+
+
+.sidebar-user:hover .sidebar-user__avatar .menu-icon{ background-color:#fff; }
+
+.sidebar-user__email{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-weight:600; font-size:14px; line-height:120%;
+}
+
+.icon-btn{
+  margin-left:auto;
+  width:32px; height:32px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:transparent; border:none; border-radius:6px;
+  cursor:pointer;
+}
+.icon-btn .menu-icon{ background-color:#DCDCDC; }
+
+/* hover по кнопке — подсветим фон самой кнопки и покрасим иконку */
+.icon-btn:hover{ background:#3D3D3D; }
+.icon-btn:hover .menu-icon{ background-color:#FFE35F; }
+
+/* доступность */
+.icon-btn:focus-visible{
+  outline:2px solid #FFE35F; outline-offset:2px;
+}
+
+.desktop-event-list .text-wrapper-2 {
+  position: relative;
+  width: fit-content;
+  margin-top: -1.00px;
+  font-family: var(--typography-base-strong-font-family);
+  font-weight: var(--typography-base-strong-font-weight);
+  color: #000000;
+  font-size: var(--typography-base-strong-font-size);
+  text-align: center;
+  letter-spacing: var(--typography-base-strong-letter-spacing);
+  line-height: var(--typography-base-strong-line-height);
+  white-space: nowrap;
+  font-style: var(--typography-base-strong-font-style);
+}
+
+.desktop-event-list .button {
+
+  box-sizing: border-box;
+  display: flex;
+  align-self: stretch;
+  width: 110%;
+  min-width: 60px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  position: relative;
+  background-color: #FFE35F;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.button-qr {
+  font-family: var(--typography-base-strong-font-family) !important;
+  font-size: var(--typography-base-strong-font-size) !important;
+  font-style: var(--typography-base-strong-font-style)  !important;
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-self: stretch;
+  width: 110%;
+  min-width: 60px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  position: relative;
+  background-color: #FFE35F;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.button, .button-2 { cursor: pointer !important; }
+
+.button-publish {
+  cursor: pointer !important;
+  background: #FFE35F;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+
+
+
+
+.button_create_node {
+    margin-left: 5%;
+    box-sizing: border-box;
+    display: flex;
+    align-self: stretch;
+    width: 63%;
+    min-width: 44px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 18px 10px;
+    position: relative;
+    background-color: #FFE35F;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.desktop-event-list .div {
+    margin-right: 12%;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.desktop-event-list .menu-item-sidebar {
+  width: 270px;
+  align-items: center;
+  gap: 10px;
+  padding: 25px 8px;
+  align-self: stretch;
+  background-color: #292929;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-color: #292929;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 120%;
+margin-bottom: -8%;
+}
+
+.desktop-event-list .menu-item {
+  width: 216px;
+  align-items: flex-start;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.desktop-event-list .button-2 {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-width: 60px;
+  height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  position: relative;
+  background-color: #FFE35F;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.desktop-event-list .button-3 {
+  all: unset;
+  box-sizing: border-box;
+  position: relative;
+  width: fit-content;
+  margin-top: -0.50px;
+  font-family: var(--typography-base-strong-font-family);
+  font-weight: var(--typography-base-strong-font-weight);
+  color: #000000;
+  font-size: var(--typography-base-strong-font-size);
+  text-align: center;
+  letter-spacing: var(--typography-base-strong-letter-spacing);
+  line-height: var(--typography-base-strong-line-height);
+  white-space: nowrap;
+  font-style: var(--typography-base-strong-font-style);
+}
+
+.button-2:hover, .button_create_node:hover, .button:hover, .button-publish:hover, .upload-btn:hover {
+  color: var(--bs-btn-hover-color);
+    background-color: rgb(255, 235, 109);
+}
+
+.menu-link,
+.users-group > summary.menu-link{
+  display:flex;
+  align-items:center;
+  gap:var(--sb-item-gap);
+  height:var(--sb-item-h);            /* фиксированная высота */
+  padding:0 var(--sb-item-px);        /* высоту даёт height */
+  width:100%;
+  box-sizing:border-box;
+  border-radius:var(--sb-item-radius);
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.menu-icon{
+  width:20px; height:20px; flex:0 0 20px;
+  display:inline-block;
+  object-fit:contain;                 /* если это <img> */
+}
+
+/* текст — в одну строку с троеточием */
+.menu-text{
+  flex:1 1 auto;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  line-height:1;                      /* чтобы не «надувало» высоту */
+}
+
+/* подменю — те же размеры пунктов */
+.submenu{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding-left:12px;
+  margin-top:6px;
+}
+.submenu .menu-link{
+  height:var(--sb-item-h);
+  padding:0 var(--sb-item-px);
+}
+
+.menu-link{
+  display:flex; align-items:center; gap:16px;
+  padding:10px 16px;
+  background:#292929;
+  border:1px solid transparent;
+  border-radius:8px;
+  color:#fff;
+  text-decoration:none;
+  transition:background-color .15s, border-color .15s, color .15s;
+}
+.menu-icon{
+  width:20px; height:20px; display:inline-block; flex:0 0 20px;
+  background-color:#DCDCDC;                               /* базовый цвет контура */
+  -webkit-mask-image: var(--icon-url);
+          mask-image: var(--icon-url);
+  -webkit-mask-repeat:no-repeat;           mask-repeat:no-repeat;
+  -webkit-mask-position:center;            mask-position:center;
+  -webkit-mask-size:contain;               mask-size:contain;
+  transition: background-color .18s ease;  /* мягкая смена цвета */
+}
+.menu-text{
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-weight:600; font-size:14px; line-height:120%;
+  color:inherit;
+}
+
+/* HOVER (если не активный) */
+.menu-link:hover:not(.is-active){
+  background:#3D3D3D;
+  border-color:transparent;
+  color:#fff;                        /* текст */
+}
+.menu-link:hover:not(.is-active) .menu-icon{
+  filter: brightness(0) invert(1);   /* белая иконка */
+}
+
+/* ACTIVE (класс на ссылке) */
+.menu-link.is-active,
+.menu-link.is-active:hover{          /* hover не меняет active */
+  background:#3E3C2E;
+  border-color:#FFE35F;
+  color:#FFE35F;
+}
+
+
+.menu-link.is-active .menu-icon{
+     filter: brightness(0) invert(1) sepia(64%) saturate(740%) hue-rotate(352deg) brightness(104%) contrast(102%);
+}
+
+.logout-overlay{
+  position:fixed; inset:0; z-index:1001;
+  background: rgba(38,38,38,.36);
+  display:none; align-items:center; justify-content:center;
+}
+.logout-modal{
+  background:#fff; border-radius:10px;
+  padding:32px 48px 24px;
+  width: 455px; min-height: 220px;
+  box-shadow: 0 8px 32px rgba(60,60,80,.08);
+  position:relative; display:flex; flex-direction:column; gap:16px;
+}
+.logout-title{
+  font-family:'Raleway', sans-serif; font-weight:700; font-size:29px; line-height:120%;
+  color:#252525; margin:0;
+}
+.logout-desc{
+  font-family:'Instrument Sans', sans-serif; font-size:16px; line-height:120%; color:#4F4F4F;
+}
+.logout-actions{
+  margin-top: 8px;
+  display:flex; gap:12px; justify-content:flex-end;
+}
+
+/* кнопка закрытия (крестик) */
+.logout-close{
+  position:absolute; top:16px; right:16px;
+  width:32px; height:32px; border:none; background:transparent; border-radius:6px;
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.logout-close:focus-visible{ outline:2px solid #FFE35F; outline-offset:2px; }
+
+.draft-overlay{
+  position:fixed; inset:0; z-index:1001;
+  background: rgba(38,38,38,.36);
+  display:none; align-items:center; justify-content:center;
+}
+.draft-modal{
+  background:#fff; border-radius:10px;
+  padding: 32px 24px 24px;
+  width: 509px; min-height: 216px;
+  box-shadow: 0 8px 32px rgba(60,60,80,.08);
+  position:relative; display:flex; flex-direction:column; gap:16px;
+}
+.draft-title{
+  font-family: Raleway, serif;
+font-weight: 700;
+font-style: Bold;
+font-size: 23px;
+leading-trim: NONE;
+line-height: 120%;
+  color: #000000; margin:0;
+}
+.draft-desc{
+  font-family: Instrument Sans;
+font-weight: 500;
+font-style: Medium;
+font-size: 18px;
+leading-trim: NONE;
+line-height: 130%;
+letter-spacing: 0%;
+ color:#000000;
+}
+.draft-actions{
+  margin-top: 8px;
+  display:flex; gap:12px; justify-content:flex-end;
+}
+
+/* кнопка закрытия (крестик) */
+.draft-close{
+  position:absolute; top:16px; right:16px;
+  width:32px; height:32px; border:none; background:transparent; border-radius:6px;
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
+}
+.draft-close:focus-visible{ outline:2px solid #FFE35F; outline-offset:2px; }
+
+
+.btn{ min-width: 100px; height:46px; border-radius:8px; padding:0 16px; font-weight:600; }
+.btn-danger{ background:#EF4444; color:#fff; border:none; }
+.btn-danger:hover{ background:#BD2F2F; }
+
+.btn-next-step{ background: #ffe35f; color:black; border:none; }
+.btn-next-step:hover{ color: var(--bs-btn-hover-color);
+    background-color: rgb(255, 235, 109); }
+
+.btn-accent {
+    background: #ffffff;
+    border: 2px solid #DCDCDC;
+    color: #000;
+    width: 85px;
+    border-radius: 8px;
+    height: 46px;
+    padding: 0 16px;
+    font-weight: 600;
+}
+.btn-accent:hover {
+  background: #4F4F4F;
+  color: white;
+}
+.btn-accent:active {
+  background: rgba(255, 227, 95, 0.20);
+}
+.btn-accent:focus-visible {
+  outline: 2px solid #FFE35F;
+  outline-offset: 2px;
+}
+
+.ut-pagination .pagination{
+  display:flex; gap:8px; flex-wrap:wrap;
+  margin:0; padding:0; list-style:none;
+}
+
+.ut-pagination .page-item{ /* на всякий случай выровняем */
+  display:flex;
+}
+
+.ut-pagination .page-link{
+  display:flex; align-items:center; justify-content:center;
+  min-width:42px; height:40px; padding:0 12px;
+  border-radius:8px;
+  background:#292929;
+  border:1px solid transparent;
+  color:#fff; text-decoration:none;
+  font-family:"Instrument Sans",system-ui,sans-serif;
+  font-weight:600; font-size:14px; line-height:1;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+}
+
+/* hover/active/disabled */
+.ut-pagination .page-link:hover{
+  background:#3D3D3D; color:#fff;
+}
+.ut-pagination .page-item.active .page-link{
+  background:#3E3C2E;
+  border-color:var(--ut-accent);
+  color:var(--ut-accent);
+  cursor:default; pointer-events:none;
+}
+.ut-pagination .page-item.disabled .page-link{
+  background:#1f1f1f; color:#8f8f8f;
+  cursor:not-allowed; pointer-events:none; opacity:.8;
+}
+
+/* фокус по доступности */
+.ut-pagination .page-link:focus-visible{
+  outline:2px solid var(--ut-accent);
+  outline-offset:2px;
+}
+
+input:focus,
+input:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* якорь, чтобы поповер позиционировался из коробки */
+.ec-date-col { position: relative; }
+
+/* calendar popover */
+.ec-cal {
+  position: absolute;
+  top: calc(40% + 8px);
+  left: 0;
+  z-index: 1000;
+  width: 276px;            /* как в макете */
+  padding: 12px 16px 24px;
+  background: #fff;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.08), 0 3px 10px rgba(0,0,0,.10);
+  user-select: none;
+}
+.ec-cal[hidden] { display: none !important; }
+
+/* header */
+.ec-cal-head{ height:28px; display:flex; align-items:center; justify-content:space-between; }
+.ec-cal-title{ font:700 14px/17px Inter, "Instrument Sans", system-ui, sans-serif; color:#18181B; }
+
+/* nav buttons 28x28 */
+.ec-cal-btn{
+  width:28px; height:28px; display:grid; place-items:center;
+  padding:5px; border:1px solid #E4E4E7; border-radius:4px; background:#fff; cursor:pointer;
+}
+.ec-cal-btn:focus-visible{ outline:2px solid #FFE35F; outline-offset:2px; }
+
+/* иконки стрелок через mask, чтобы не мигали */
+.ec-cal-btn.prev::before, .ec-cal-btn.next::before{
+  content:""; width:18px; height:18px; background:#7C7C7C;
+  -webkit-mask-size:contain; -webkit-mask-repeat:no-repeat; -webkit-mask-position:center;
+          mask-size:contain;         mask-repeat:no-repeat;         mask-position:center;
+}
+.ec-cal-btn.prev::before{
+  -webkit-mask-image:url('/static/images/chevron-left.svg');
+          mask-image:url('/static/images/chevron-left.svg');
+}
+.ec-cal-btn.next::before{
+  -webkit-mask-image:url('/static/images/chevron-right.svg');
+          mask-image:url('/static/images/chevron-right.svg');
+}
+
+/* week labels + grid */
+.ec-cal-week{
+  margin-top:8px; display:grid; grid-template-columns:repeat(7,1fr);
+  text-align:center; font:500 12px/15px Inter, "Instrument Sans", system-ui, sans-serif; color:#7C7C7C;
+}
+.ec-cal-grid{
+  margin-top:6px; display:grid;
+  grid-template-columns:repeat(7,1fr);
+  grid-auto-rows:31px;                /* как в слоях */
+  gap:14px 5px;                      /* подобрано под макет */
+}
+
+/* day cells */
+.ec-cal-day{
+  border:0; background:transparent; border-radius:4px;
+  display:grid; place-items:center; cursor:pointer;
+  font:500 12px/15px Inter, "Instrument Sans", system-ui, sans-serif; color:#18181B;
+}
+.ec-cal-day:hover{ background:#FAFAFA; }
+.ec-cal-day.is-out{ color:#7C7C7C; }
+.ec-cal-day.is-selected{ background:#FFE35F; color:#000; }
+
+
+/* Поповер времени */
+.ec-time-popover{
+  position:absolute; z-index:1000;
+  width:112px; background:#fff; border:1px solid #E4E4E7;
+  border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.08),0 12px 32px rgba(0,0,0,.12);
+  font-family: 'Instrument Sans', sans-serif;
+}
+.ec-time-head{
+  font-family: 'Inter', sans-serif;
+    border-bottom: inherit;
+    padding-top: 12px;
+    height: 40px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 16px;
+}
+.ec-time-cols{ display:flex; align-items:stretch; }
+.ec-time-col{ flex:1; max-height:200px; overflow:auto; padding:4px 6px; }
+.ec-time-opt{
+  font-family: 'Inter', sans-serif;
+  padding:8px 10px; border-radius:6px; text-align:center;
+  font-size:16px; line-height:1; cursor:pointer; user-select:none;
+}
+.ec-time-opt:hover{ background:#F3F3F3; }
+.ec-time-opt.is-selected{ background:#FFE35F; color:#000; font-weight:600; }
+.ec-time-footer{ display:flex; justify-content:flex-end; margin-top:12px; }
+.ec-time-ok{
+    margin-right: 10px;
+    margin-bottom: 5px;
+    min-width: 33px;
+    height: 24px;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+}
+.ec-time-ok:active{ transform:translateY(1px); }
+/* светлый вариант кнопки, если хочешь как на скрине */
+.ec-time-ok.ec--yellow{
+    border-radius: 4px;
+    angle: 0 deg;
+    opacity: 1;
+    padding-top: 1px;
+    padding-right: 8px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    gap: 8px;
+    background: #FFE35F;
+    color: #000;
+}
+/* Сжимаем «Previous/Next» на узких экранах */
+@media (max-width: 520px){
+  .ut-pagination .page-link{ min-width:36px; height:36px; padding:0 10px; }
+  .ut-pagination .page-item .page-link[data-label]::after{
+    content: attr(data-label); margin-left:6px;
+  }
+}
+
