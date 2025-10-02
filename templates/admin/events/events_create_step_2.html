@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <!-- Подключение Bootstrap CSS -->
+	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Подключение Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="/static/css/style_events.css" />
+</head>
+<body>
+  <div class="ec-desktop-event-create">
+    {% include 'admin/sidebar.html' %}
+    <form method="POST" action="/admin/events/create" enctype="multipart/form-data">
+      <input type="hidden" name="step" value="step_2">
+      <div class="ec-container-form">
+
+        <div class="ec-row-view9">
+          <button
+            type="button"
+            style="background:none;border:none;padding:0;margin:0;cursor:pointer;outline:none;"
+            onclick="window.location.href='/admin/events/cancel'"
+            aria-label="Назад"
+          >
+            <img src="/static/images/sidebar/left.svg" alt="Back" draggable="false" style="display:block;" />
+          </button>
+          <span class="text6">Create new event</span>
+        </div>
+
+        <div class="ec-date-block">
+          <div class="ec-column7">
+            <span class="ec-text7">Date and time</span>
+            <div class="ec-column8">
+              <div class="ec-row-view10">
+                <div class="ec-date-col">
+                  <span class="ec-text8">Start date</span>
+                  <div class="ec-button-row-view">
+                    <input
+                      class="ec-text9"
+                      id="start-date"
+                      name="start_date"
+                      type="text"
+                      placeholder="Select date"
+                      data-picker="date"
+                      style="font-family: Instrument Sans, serif;flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                    />
+                     <img src="/static/images/sidebar/CalendarBlank.svg" class="ec-input-calendar" alt="calendar"
+     onclick="EC_OPEN('start-date')" style="cursor:pointer; margin-left:-32px;">
+                  </div>
+
+                  <span class="ec-text8" style="margin-top:18px;">Start time</span>
+                    <div class="ec-button-row-view">
+                      <input
+                        class="ec-text9"
+                        id="start-time"
+                        name="start_time"
+                        type="time"
+                        data-picker="time"
+                        placeholder="Select time"
+                        style="font-family: Instrument Sans, serif;flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                      />
+                      <img src="/static/images/alarm.svg" class="ec-input-calendar" alt="clock"
+                           onclick="ET.openTimePicker(document.getElementById('start-time'))"
+                           style="cursor:pointer; margin-left:-32px;" />
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="ec-date-col">
+                  <span class="ec-text8">End date</span>
+                  <div class="ec-button-row-view">
+                    <input
+                      class="ec-text9"
+                      id="end-date"
+                      name="end_date"
+                      type="text"
+                      placeholder="Select date"
+                      data-picker="date"
+                      style="font-family: Instrument Sans, serif;flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                    />
+                    <img src="/static/images/sidebar/CalendarBlank.svg" class="ec-input-calendar" alt="calendar"
+     onclick="EC_OPEN('end-date')" style="cursor:pointer; margin-left:-32px;">
+                  </div>
+
+                  <div class="ec-view2">
+                    <div class="ec-row-view12">
+                      <label class="ec-styled-checkbox">
+                        <input type="checkbox" name="free_entrance" id="same-checkbox">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-label ec-text10">Same as a start date</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <span class="ec-text8" style="margin-top:8px;">End time</span>
+                  <div class="ec-button-row-view">
+                    <input
+                      class="ec-text9"
+                      id="end-time"
+                      name="end_time"
+                      type="time"
+                      placeholder="Select time"
+                      data-picker="time"
+                      style="font-family: Instrument Sans, serif;flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"
+                    />
+                    <img src="/static/images/alarm.svg" class="ec-input-calendar" alt="clock"
+                           onclick="ET.openTimePicker(document.getElementById('end-time'))"
+                           style="cursor:pointer; margin-left:-32px;" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ec-column7">
+            <span class="ec-text7">Location</span>
+            <div class="ec-column11">
+
+              <div class="ec-input-block">
+                <label class="ec-text8" for="venue-name">Venue name</label>
+                <div class="ec-input-row">
+                  <input
+                    class="ec-input-field"
+                    id="venue-name"
+                    name="venue_name"
+                    type="text"
+                    maxlength="60"
+                    placeholder="Enter name"
+                    oninput="updateCharCount(this, '#venue-name-count', 60)"
+                    autocomplete="off"
+                  />
+                  <div class="ec-input-info">
+                    <span id="venue-name-count" class="ec-input-counter">0/60 characters</span>
+<!--                    <img src="/static/images/sidebar/CalendarBlank.svg" class="ec-input-calendar" alt="calendar"/>-->
+                  </div>
+                </div>
+              </div>
+
+              <div class="ec-row-view10">
+                 <div class="ec-input-block">
+  <label class="ec-text8" for="country-select">Venue city</label>
+  <div class="ec-input-row-2">
+    <select id="country-select" name="venue_city" class="ec-input-field">
+      <option value="" disabled selected hidden>Select city</option>
+      {% for city in cities_list %}
+      <option value="{{ city.id }}">{{ city.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+</div>
+                <input type="hidden" id="venue-city-id" name="venue_city_id">
+                <input type="hidden" id="venue-city-lat" name="venue_city_lat">
+                <input type="hidden" id="venue-city-lon" name="venue_city_lon">
+
+                <div class="ec-row-view10">
+                  <div class="ec-input-block">
+                    <label class="ec-text8" for="venue-address">Venue address</label>
+                    <div class="ec-input-row-2">
+                      <input
+                        class="ec-input-field"
+                        id="venue-address"
+                        name="venue_address"
+                        type="text"
+                        maxlength="60"
+                        placeholder="Search address"
+                        autocomplete="off"
+
+                      />
+                      <div class="ec-input-info">
+                      </div>
+                      <input type="hidden" id="venue-lat" name="venue_lat">
+                      <input type="hidden" id="venue-lon" name="venue_lon">
+                      <input type="hidden" id="venue-postcode" name="venue_postcode">
+                      <input type="hidden" id="venue-country" name="venue_country">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="ec-form-actions">
+            <div class="ec-progress-indicator">
+              <span class="ec-step-text">2 of 3</span>
+            </div>
+            <div class="ec-button-row">
+              <button class="btn btn-accent" type="button" onclick="window.location.href='/admin/events/cancel'">Cancel</button>
+              <button class="btn btn-next-step">Next</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// 	const input = document.getElementById('date-input');
+// input.addEventListener('focus', function() {
+//   this.placeholder = 'ДД.ММ.ГГГГ';
+// });
+// input.addEventListener('blur', function() {
+//   if (!this.value) this.placeholder = 'Select date';
+// });
+
+function updateCharCount(input, counterSelector, max) {
+  const val = input.value.length;
+  document.querySelector(counterSelector).textContent = `${val}/${max} characters`;
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const checkbox = document.getElementById('same-checkbox');
+  const startDate = document.getElementById('start-date');
+  const endDate = document.getElementById('end-date');
+
+  checkbox.addEventListener('change', function() {
+    if (this.checked) {
+      endDate.value = startDate.value;
+      endDate.setAttribute('readonly', 'readonly');
+    } else {
+      endDate.removeAttribute('readonly');
+      endDate.value = '';
+    }
+  });
+
+  // Если дата старта поменялась и чекбокс активен — обновить конец
+  startDate.addEventListener('change', function() {
+    if (checkbox.checked) {
+      endDate.value = startDate.value;
+    }
+  });
+});
+</script>
+
+<script>
+(function () {
+  const pickers = new Map();
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function toISO(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+
+  function makeCalendar(input) {
+    const wrap = input.closest('.ec-date-col') || input.parentElement;
+    const cal = document.createElement('div');
+    cal.className = 'ec-cal';
+    cal.setAttribute('hidden','');
+
+    const today = new Date();
+    let selected = input.value ? new Date(input.value) : null;
+    let view = selected ? new Date(selected) : new Date(today.getFullYear(), today.getMonth(), 1);
+
+    cal.innerHTML = `
+      <div class="ec-cal-head">
+        <button type="button" class="ec-cal-btn prev" aria-label="Previous month"></button>
+        <div class="ec-cal-title"></div>
+        <button type="button" class="ec-cal-btn next" aria-label="Next month"></button>
+      </div>
+      <div class="ec-cal-week">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="ec-cal-grid"></div>
+    `;
+    wrap.appendChild(cal);
+
+    const titleEl = cal.querySelector('.ec-cal-title');
+    const grid = cal.querySelector('.ec-cal-grid');
+
+    function render() {
+      const month = view.toLocaleString('en-US',{month:'long'});
+      titleEl.textContent = `${month.charAt(0).toUpperCase()+month.slice(1)} ${view.getFullYear()}`;
+
+      grid.innerHTML = '';
+      const first = new Date(view.getFullYear(), view.getMonth(), 1);
+      const startIdx = first.getDay(); // Su=0
+      const start = new Date(first); start.setDate(first.getDate() - startIdx);
+
+      for (let i=0;i<42;i++){
+        const d = new Date(start); d.setDate(start.getDate()+i);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ec-cal-day';
+        btn.textContent = d.getDate();
+
+        if (d.getMonth() !== view.getMonth()) btn.classList.add('is-out');
+        // сравниваем только дату:
+        if (selected && toISO(d) === toISO(selected)) btn.classList.add('is-selected');
+
+        btn.addEventListener('click', () => {
+          selected = new Date(d);
+          // пишем в поле ровно ISO, подойдёт и для type="text", и для type="date"
+          input.value = toISO(selected);
+          input.dispatchEvent(new Event('change', {bubbles:true}));
+          close();
+        });
+
+        grid.appendChild(btn);
+      }
+    }
+
+    function open() {
+      cal.removeAttribute('hidden');
+      render();
+      setTimeout(() => {
+        document.addEventListener('mousedown', onDoc);
+        document.addEventListener('keydown', onEsc);
+      }, 0);
+    }
+    function close(){
+      cal.setAttribute('hidden','');
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onEsc);
+    }
+    function onDoc(e){
+      if (!cal.contains(e.target)) close();
+    }
+    function onEsc(e){ if (e.key === 'Escape') close(); }
+
+    cal.querySelector('.prev').addEventListener('click', () => {
+      view = new Date(view.getFullYear(), view.getMonth()-1, 1);
+      render();
+    });
+    cal.querySelector('.next').addEventListener('click', () => {
+      view = new Date(view.getFullYear(), view.getMonth()+1, 1);
+      render();
+    });
+
+    const api = { open, close, render };
+    pickers.set(input.id || (input.name + Math.random()), api);
+    return api;
+  }
+
+  function ensureTextType(input){
+    // глушим нативный пикер: переводим поле в text
+    try { if (input.type.toLowerCase() === 'date') input.type = 'text'; } catch(e){}
+    input.setAttribute('autocomplete','off');
+    input.setAttribute('inputmode','numeric');
+  }
+
+  function openFor(input){
+    ensureTextType(input);
+    const key = input.id || input.name;
+    if (!pickers.has(key)) makeCalendar(input);
+    pickers.get(key).open();
+  }
+
+  // Открывать по ФОКУСУ на поле (в т.ч. при клике в него)
+  document.addEventListener('focusin', (e)=>{
+    const input = e.target.closest('input.ec-text9[data-picker="date"], input[data-picker="date"], input.ec-date');
+    if (!input) return;
+    openFor(input);
+  });
+
+  // Открывать по клику на иконку календаря
+  document.addEventListener('click', (e)=>{
+    const icon = e.target.closest('.ec-input-calendar');
+    if (!icon) return;
+    const input = icon.closest('.ec-button-row-view')?.querySelector('input.ec-text9, input[data-picker="date"], input.ec-date');
+    if (!input) return;
+    e.preventDefault();
+    input.focus(); // сработает focusin и откроет календарь
+  });
+
+  // Для старых обработчиков, если хочешь вручную вызвать
+  window.EC_OPEN = function(id){
+    const input = document.getElementById(id);
+    if (input) openFor(input);
+  };
+})();
+</script>
+<script>
+const ET = (()=> {
+  const minuteStep = 1;
+  let pop, sel = {h:0,m:0}, currentInput = null;
+
+  function buildPopover(){
+    pop = document.createElement('div');
+    pop.className = 'ec-time-popover';
+    pop.innerHTML = `
+      <div class="ec-time-head" id="ec-time-head">00:00</div>
+      <div class="ec-time-cols">
+        <div class="ec-time-col" id="ec-col-h"></div>
+        <div class="ec-time-col" id="ec-col-m"></div>
+      </div>
+      <div class="ec-time-footer">
+        <button type="button" class="ec-time-ok ec--yellow" id="ec-time-ok">OK</button>
+      </div>`;
+    document.body.appendChild(pop);
+
+    pop.addEventListener('click', e=>{
+      const item = e.target.closest('.ec-time-opt');
+      if(!item) return;
+      const t = item.dataset.type, v = parseInt(item.dataset.val,10);
+      if(t==='h') sel.h = v;
+      if(t==='m') sel.m = v;
+      updateSelected();
+    });
+
+    document.getElementById('ec-time-ok').addEventListener('click', applyAndClose);
+
+    document.addEventListener('keydown', e => { if(e.key==='Escape') close(); });
+
+    document.addEventListener('mousedown', e => {
+      if(!pop || !currentInput) return;
+      const wrap = currentInput.closest('.ec-button-row-view');
+      const insidePopover = pop.contains(e.target);
+      const insideWrap    = wrap && wrap.contains(e.target);
+      if(!insidePopover && !insideWrap) close();
+    });
+  }
+
+  function fillLists(){
+    const colH = document.getElementById('ec-col-h');
+    const colM = document.getElementById('ec-col-m');
+    colH.innerHTML = colM.innerHTML = '';
+    for(let h=0; h<24; h++) colH.appendChild(opt(h,'h'));
+    for(let m=0; m<60; m+=minuteStep) colM.appendChild(opt(m,'m'));
+  }
+  function opt(v,type){
+    const d = document.createElement('div');
+    d.className = 'ec-time-opt';
+    d.dataset.type = type; d.dataset.val = v;
+    d.textContent = String(v).padStart(2,'0');
+    return d;
+  }
+
+  function parseInputValue(val){
+    const m = /^(\d{1,2}):(\d{2})$/.exec(val || '');
+    if(m){
+      sel.h = Math.min(23, Math.max(0, +m[1]));
+      sel.m = Math.min(59, Math.max(0, +m[2]));
+    } else {
+      const now = new Date();
+      sel.h = now.getHours();
+      sel.m = now.getMinutes() - (now.getMinutes()%minuteStep);
+    }
+  }
+
+  function positionPopover(input){
+    const r = input.getBoundingClientRect();
+    pop.style.position = 'absolute';
+    pop.style.left = `${Math.round(window.scrollX + r.left)}px`;
+    pop.style.top  = `${Math.round(window.scrollY + r.bottom + 8)}px`;
+    pop.style.zIndex = 9999;
+  }
+
+  function updateHeader(){
+    const hh = String(sel.h).padStart(2,'0');
+    const mm = String(sel.m).padStart(2,'0');
+    pop.querySelector('#ec-time-head').textContent = `${hh}:${mm}`;
+  }
+  function updateSelected(){
+    pop.querySelectorAll('.ec-time-opt').forEach(el=>el.classList.remove('is-selected'));
+    pop.querySelector(`.ec-time-opt[data-type="h"][data-val="${sel.h}"]`)?.classList.add('is-selected');
+    pop.querySelector(`.ec-time-opt[data-type="m"][data-val="${sel.m}"]`)?.classList.add('is-selected');
+    updateHeader();
+  }
+
+  function highlight(on){
+    currentInput?.closest('.ec-button-row-view')?.classList.toggle('is-active', on);
+  }
+
+  function applyAndClose(){
+    if(currentInput){
+      currentInput.value = `${String(sel.h).padStart(2,'0')}:${String(sel.m).padStart(2,'0')}`;
+      currentInput.dispatchEvent(new Event('change',{bubbles:true}));
+      currentInput.blur();
+    }
+    close();
+  }
+
+  function openTimePicker(input){
+    currentInput = input;
+    if(!pop){ buildPopover(); fillLists(); }
+    parseInputValue(input.value);
+    updateSelected();
+    positionPopover(input);
+    pop.style.display = 'block';
+    highlight(true);
+  }
+
+  function close(){
+    if(pop) pop.style.display = 'none';
+    highlight(false);
+    currentInput = null;
+  }
+
+  // ————————— Привязка —————————
+  // Полностью отключаем нативный пикер: меняем type="time" на text
+  function normalizeInput(input){
+    if(input.dataset._etNormalized) return;
+    input.dataset._etNormalized = '1';
+
+    if(input.type.toLowerCase() === 'time'){
+      input.dataset._origType = 'time';
+      try { input.type = 'text'; } catch(e) {}
+      input.setAttribute('inputmode','numeric');
+      input.setAttribute('autocomplete','off');
+      if(!input.placeholder) input.placeholder = 'hh:mm';
+    }
+
+    // Клик по иконке справа — просто фокус на поле
+    input.parentElement?.querySelector('.ec-input-calendar')
+      ?.addEventListener('click', (e)=>{ e.preventDefault(); input.focus(); });
+  }
+
+  // Делегирование: любое поле с data-picker="time" или .ec-time
+  function bindDelegation(){
+    document.addEventListener('focusin', (e)=>{
+      const input = e.target.closest('input[data-picker="time"], input.ec-time');
+      if(!input) return;
+      normalizeInput(input);
+      // открываем кастомный поповер
+      openTimePicker(input);
+    });
+  }
+
+  function bindTimeInputs(selector='input[data-picker="time"], input.ec-time'){
+    document.querySelectorAll(selector).forEach(normalizeInput);
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    bindTimeInputs();   // нормализуем существующие
+    bindDelegation();   // и ловим будущие
+  });
+
+  return { openTimePicker, bindTimeInputs };
+})();
+</script>
+
+<script>
+(function(){
+  // активируем подсветку у всех блоков с инпутом + иконкой
+  document.querySelectorAll('.ec-button-row-view').forEach(wrap => {
+    const input = wrap.querySelector('input');
+    const icon  = wrap.querySelector('.ec-input-calendar');
+    if (!input || !icon) return;
+
+    // Клик по иконке — фокусим инпут, включаем подсветку и открываем пикер
+    icon.addEventListener('click', (e) => {
+      e.preventDefault();
+      input.focus({preventScroll:true});
+      wrap.classList.add('is-active');
+
+      // открываем соответствующий пикер
+      if (input.type === 'date' && input.showPicker) {
+        input.showPicker();                 // нативный календарь
+      } else if (input.type === 'time') {
+        if (window.ET?.openTimePicker) {    // твой кастомный таймпикер
+          ET.openTimePicker(input);
+        }
+      }
+    });
+
+    // Любое событие окончания выбора — снимаем подсветку
+    input.addEventListener('change', () => wrap.classList.remove('is-active'));
+    input.addEventListener('blur',   () => wrap.classList.remove('is-active'));
+  });
+
+  // Esc — закрыли пикер → снимаем подсветку
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.ec-button-row-view.is-active')
+        .forEach(w => w.classList.remove('is-active'));
+    }
+  });
+
+  document.addEventListener('mousedown', (e) => {
+    if (!e.target.closest('.ec-button-row-view') &&
+        !e.target.closest('.et-timepicker')) {
+      document.querySelectorAll('.ec-button-row-view.is-active')
+        .forEach(w => w.classList.remove('is-active'));
+    }
+  });
+
+})();
+</script>
+<script>
+// маленький дебаунс
+const debounce = (fn, ms=220) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+
+function initCityAutocomplete({
+  inputSel = '#venue-city',
+  hiddenIdSel = '#venue-city-id',
+  hiddenLatSel = '#venue-city-lat',
+  hiddenLonSel = '#venue-city-lon',
+  apiUrl = '/api/cities',
+  minChars = 2,
+  limit = 15
+} = {}) {
+  const input = document.querySelector(inputSel);
+  if (!input) return;
+
+  const row = input.closest('.ec-input-row-2');
+  const hiddenId = document.querySelector(hiddenIdSel);
+  const hiddenLat = document.querySelector(hiddenLatSel);
+  const hiddenLon = document.querySelector(hiddenLonSel);
+
+  const list = document.createElement('div');
+  list.className = 'ec-ac-list';
+  row.appendChild(list);
+
+  let shown = [];
+  let active = -1;
+
+  function openList() {
+    list.style.display = 'block';
+    row.classList.add('is-open');
+  }
+  function closeList() {
+    list.style.display = 'none';
+    row.classList.remove('is-open');
+    active = -1;
+  }
+
+  function render(items) {
+    list.innerHTML = '';
+    if (!items.length) {
+      list.innerHTML = '<div class="ec-ac-empty">No results</div>';
+      return;
+    }
+    items.forEach((c, i) => {
+      const el = document.createElement('div');
+      el.className = 'ec-ac-item';
+      el.innerHTML = `
+        <span>${c.name}</span>
+        <small>— ${c.country}${c.admin ? ', ' + c.admin : ''}</small>
+      `;
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault(); choose(i);
+      });
+      list.appendChild(el);
+    });
+  }
+
+  function choose(i) {
+    const c = shown[i];
+    if (!c) return;
+    input.value = `${c.name}, ${c.country}`;
+    hiddenId && (hiddenId.value = c.id ?? '');
+    hiddenLat && (hiddenLat.value = c.lat ?? '');
+    hiddenLon && (hiddenLon.value = c.lon ?? '');
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    closeList();
+  }
+
+  function highlight(i) {
+    const items = list.querySelectorAll('.ec-ac-item');
+    items.forEach(el => el.classList.remove('is-active'));
+    if (i >= 0 && items[i]) {
+      items[i].classList.add('is-active');
+      items[i].scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  const search = debounce(() => {
+    const q = input.value.trim();
+    if (q.length < minChars) { closeList(); return; }
+    fetch(`${apiUrl}?q=${encodeURIComponent(q)}&limit=${limit}`, { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        shown = data || [];
+        render(shown);
+        openList();
+      })
+      .catch(() => { shown = []; render(shown); openList(); });
+  }, 220);
+
+  input.addEventListener('input', search);
+  input.addEventListener('focus', () => { if (input.value.trim().length >= minChars) search(); });
+  input.addEventListener('blur', () => setTimeout(closeList, 120));
+
+  input.addEventListener('keydown', (e) => {
+    if (list.style.display !== 'block') return;
+    const max = shown.length - 1;
+    if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(max, active + 1); highlight(active); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(0, active - 1); highlight(active); }
+    else if (e.key === 'Enter') { if (active >= 0) { e.preventDefault(); choose(active); } }
+    else if (e.key === 'Escape') { closeList(); }
+  });
+
+  document.addEventListener('mousedown', (e) => {
+    if (!row.contains(e.target)) closeList();
+  });
+}
+
+// Старт
+initCityAutocomplete();
+</script>
+<script>
+(function(){
+  const addressInput = document.getElementById('venue-address');
+  if(!addressInput) return;
+
+  // Данные выбранного города — положи их после выбора города:
+  // например, элемент #venue-city.dataset = {countryCode:'CZ', city:'Prague', lat:'50.08', lon:'14.43'}
+  const cityInput = document.getElementById('venue-city');
+
+  const latEl = document.getElementById('venue-lat');
+  const lonEl = document.getElementById('venue-lon');
+  const pcEl  = document.getElementById('venue-postcode');
+  const countryEl = document.getElementById('venue-country');
+
+  let box, items = [], activeIdx = -1, timer;
+
+  // Создаём контейнер подсказок
+  function ensureBox(){
+    if(box) return;
+    box = document.createElement('div');
+    box.className = 'ec-suggest';
+    box.setAttribute('hidden','');
+    addressInput.closest('.ec-input-row-2').appendChild(box);
+  }
+
+  function openBox() { box && box.removeAttribute('hidden'); }
+  function closeBox(){ if(box){ box.setAttribute('hidden',''); activeIdx=-1; } }
+
+  function render(list){
+    ensureBox();
+    box.innerHTML = '';
+    items = list || [];
+    items.forEach((it, i)=>{
+      const div = document.createElement('div');
+      div.className = 'ec-suggest__item';
+      // компактная строка
+      const street = [it.street, it.housenumber].filter(Boolean).join(' ');
+      div.textContent = street ? `${street}, ${it.city || ''} ${it.postcode || ''}`.trim() : it.label;
+      div.addEventListener('mousedown', e=>{
+        e.preventDefault();
+        pick(i);
+      });
+      box.appendChild(div);
+    });
+    if(items.length) openBox(); else closeBox();
+  }
+
+  function pick(i){
+    const it = items[i]; if(!it) return;
+    const street = [it.street, it.housenumber].filter(Boolean).join(' ');
+    addressInput.value = street || it.label;
+
+    // заполним скрытые
+    latEl.value = it.lat; lonEl.value = it.lon;
+    pcEl.value = it.postcode || '';
+    countryEl.value = it.country_code || '';
+    addressInput.dispatchEvent(new Event('change', {bubbles:true}));
+    closeBox();
+  }
+
+  function fetchAddresses(q){
+    const country = (cityInput?.dataset.countryCode || '').toUpperCase();
+    const city = cityInput?.value || cityInput?.dataset.city || '';
+    const lat = cityInput?.dataset.lat || '';
+    const lon = cityInput?.dataset.lon || '';
+
+    const p = new URLSearchParams({
+      q, limit: '10',
+      country, city, lat, lon
+    });
+    fetch(`/api/addresses?${p.toString()}`)
+      .then(r => r.json())
+      .then(render)
+      .catch(()=> render([]));
+  }
+
+  // debounce input
+  addressInput.addEventListener('input', () => {
+    const q = addressInput.value.trim();
+    if(timer) clearTimeout(timer);
+    if(q.length < 2){ closeBox(); return; }
+    timer = setTimeout(()=>fetchAddresses(q), 250);
+  });
+
+  addressInput.addEventListener('focus', () => {
+    const q = addressInput.value.trim();
+    if(q.length >= 2) fetchAddresses(q);
+  });
+
+  // клавиатура
+  addressInput.addEventListener('keydown', (e) => {
+    if(!box || box.hasAttribute('hidden')) return;
+    const els = Array.from(box.children);
+    if(e.key === 'ArrowDown'){
+      e.preventDefault(); activeIdx = Math.min(els.length-1, activeIdx+1);
+    } else if(e.key === 'ArrowUp'){
+      e.preventDefault(); activeIdx = Math.max(0, activeIdx-1);
+    } else if(e.key === 'Enter'){
+      if(activeIdx >= 0){ e.preventDefault(); pick(activeIdx); }
+      return;
+    } else if(e.key === 'Escape'){
+      closeBox(); return;
+    } else { return; }
+    els.forEach((el,i)=>el.classList.toggle('is-active', i===activeIdx));
+    els[activeIdx]?.scrollIntoView({block:'nearest'});
+  });
+
+  document.addEventListener('mousedown', (e)=>{
+    if(!box) return;
+    if(!box.contains(e.target) && e.target !== addressInput) closeBox();
+  });
+})();
+</script>
+<script>
+/**
+ * Превращает <select> в селект с поиском.
+ * select: HTMLSelectElement
+ */
+function makeSearchableSelect(select) {
+  // обёртка
+  const wrap = document.createElement('div');
+  wrap.className = 'ss-wrap et-select-city';
+  select.parentNode.insertBefore(wrap, select);
+  // скрываем оригинальный, но оставляем в форме
+  select.classList.add('ss-hidden');
+  wrap.appendChild(select);
+
+  // инпут поиска/отображения
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'ss-input ec-input-field';
+  input.placeholder = select.options[0]?.text || 'Select…';
+  input.autocomplete = 'off';
+  input.style.fontFamily = "'Instrument Sans',sans-serif";
+  wrap.appendChild(input);
+
+  // стрелка
+  const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  arrow.setAttribute('viewBox','0 0 24 24'); arrow.classList.add('ss-arrow');
+  arrow.innerHTML = '<path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+  wrap.appendChild(arrow);
+
+  // список опций
+  const list = document.createElement('div');
+  list.className = 'ss-list';
+  list.setAttribute('role','listbox');
+  wrap.appendChild(list);
+
+  // данные
+  const options = Array.from(select.options)
+    .filter(o => !(o.disabled && o.hidden))        // пропускаем placeholder
+    .map(o => ({ value: o.value, label: o.text }));
+
+  let open = false;
+  let activeIndex = -1;
+  const setOpen = (v) => {
+    open = v;
+    list.classList.toggle('open', open);
+  };
+
+  // рендер списка с фильтром
+  function render(filter = '') {
+    const f = filter.trim().toLowerCase();
+    list.innerHTML = '';
+    const filtered = options.filter(o => o.label.toLowerCase().includes(f));
+    if (!filtered.length) {
+      const empty = document.createElement('div');
+      empty.className = 'ss-option';
+      empty.style.opacity = '.6';
+      empty.style.top = '10px';
+      empty.textContent = 'No results';
+      list.appendChild(empty);
+      activeIndex = -1;
+      return;
+    }
+    filtered.forEach((o, i) => {
+      const div = document.createElement('div');
+      div.className = 'ss-option';
+      div.textContent = o.label;
+      div.dataset.value = o.value;
+      div.setAttribute('role','option');
+      div.onclick = () => choose(o);
+      list.appendChild(div);
+    });
+    activeIndex = 0;
+    highlight(activeIndex);
+  }
+
+  function highlight(i) {
+    const kids = Array.from(list.querySelectorAll('.ss-option'));
+    kids.forEach((k, idx) => k.setAttribute('aria-selected', idx === i ? 'true':'false'));
+    const el = kids[i];
+    if (el) {
+      const r = el.getBoundingClientRect();
+      const lr = list.getBoundingClientRect();
+      if (r.top < lr.top || r.bottom > lr.bottom) el.scrollIntoView({block:'nearest'});
+    }
+  }
+
+  function choose(o) {
+    // sync в исходный select
+    select.value = o.value;
+    // отобразим в инпуте
+    input.value = o.label;
+    input.dataset.value = o.value;
+    // плейсхолдер уже не нужен
+    input.classList.add('has-value');
+    setOpen(false);
+  }
+
+  // стартовое значение (если уже есть)
+  if (select.value) {
+    const current = options.find(o => o.value === select.value);
+    if (current) input.value = current.label, input.dataset.value = current.value;
+  }
+
+  // события
+  input.addEventListener('focus', () => { setOpen(true); render(input.value); });
+  input.addEventListener('click', () => { setOpen(true); render(input.value); });
+  input.addEventListener('input', () => { setOpen(true); render(input.value); });
+
+  input.addEventListener('keydown', (e) => {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'Enter')) { setOpen(true); render(input.value); return; }
+    const opts = list.querySelectorAll('.ss-option');
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (opts.length) { activeIndex = Math.min(activeIndex+1, opts.length-1); highlight(activeIndex); } }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); if (opts.length) { activeIndex = Math.max(activeIndex-1, 0);            highlight(activeIndex); } }
+    if (e.key === 'Enter')     { e.preventDefault(); const el = opts[activeIndex]; if (el) choose({ value: el.dataset.value, label: el.textContent }); }
+    if (e.key === 'Escape')    { setOpen(false); }
+  });
+
+  document.addEventListener('mousedown', (e) => {
+    if (!wrap.contains(e.target)) setOpen(false);
+  });
+
+  // клик по стрелке — раскрыть/закрыть
+  arrow.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    setOpen(!open);
+    if (open) { input.focus(); render(input.value); }
+  });
+
+  return { destroy(){ /* можно добавить при необходимости */ } };
+}
+
+// ----- инициализация для нужного select -----
+document.addEventListener('DOMContentLoaded', () => {
+  const sel = document.getElementById('country-select');   // поменяй на свой id
+  if (sel) makeSearchableSelect(sel);
+});
+</script>
+</html>

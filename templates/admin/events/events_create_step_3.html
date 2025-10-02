@@ -87,6 +87,21 @@
                   </div>
                 </div>
 
+                <div class="et-input-block">
+                <label class="ec-text8" for="currency-input">Currency</label>
+                      <div class="et-select">
+                        <select class="ec-input-field" id="currency-input" name="currency_id" style="font-family:'Instrument Sans',sans-serif;">
+                          <option value="" disabled selected hidden>Select currency</option>
+                          {% for cur in currency_list %}
+                          <option value="{{ cur.id }}">{{ cur.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+
+
+              </div>
+
 
             </div>
 

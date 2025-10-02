@@ -117,15 +117,15 @@
         <div style="padding: 24px 16px 0 4px; margin-left: 7%;">
             <div style="color: #676767; font-size: 14px; font-weight: 600;width: 215px;white-space: nowrap;overflow: hidden;
     text-overflow: ellipsis;">
-                at {{ event.location }}, {{ event.city }}
+                at {{ event.location }}, {{ event.city_name }}
             </div>
             <div style="font-size: 22px; font-weight: 700; margin: 10px 0 0 0;width: 215px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                 {{ event.name }}
             </div>
             <div style="margin: 8px 0 0 0; color: #000; opacity: 0.8; font-size: 15px;">
-                {{ event.event_date.strftime('%A, %d %B %Y') }}
+                {{ event.date_start.strftime('%A, %d %B %Y') }}
                 <br>
-                {{ event.event_date.strftime('%H:%M') }} - {{ event.event_date_end.strftime('%H:%M') }}
+                {{ event.date_start.strftime('%H:%M') }} - {{ event.date_end.strftime('%H:%M') }}
             </div>
         </div>
         <!-- Нижний блок: количество и кнопка -->
@@ -136,10 +136,10 @@
                 </svg>
 
             </div>
-            <span style="{% if current_tab == 'unpublished' %}margin-right: 22%{% elif current_tab == 'past' %}margin-right: 27%{% else %}margin-right: 68%{% endif %};
-                margin-top: 1%;color: #ababab; font-size: 14px; font-weight: 600;">Sold {{ event.tickets_sold }}/{{ event.tickets_available }}</span>
-            {% if event.status == 'draft' %}
+            <span style="{% if current_tab == 'unpublished' %}margin-right: 22%{% elif current_tab == 'past' %}margin-right: 27%{% else %}margin-right: 20%{% endif %};
+                margin-top: 1%;color: #ababab; font-size: 14px; font-weight: 600;">Sold {{ event.tickets_total }}/{{ event.tickets_available }}</span>
              {% if user_active['role'] != 'viewer' %}
+             {% if event.status == 'draft' %}
             <form action="/admin/events" method="POST">
                 <input hidden="hidden" name="action" value="add">
                 <input hidden="hidden" name="event_id" value="{{ event.id }}">

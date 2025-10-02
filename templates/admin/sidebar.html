@@ -74,12 +74,12 @@
     </a>
   </li>
 
-  <li class="menu-item">
-    <a href="/admin/attendees" class="menu-link {% if request.path.startswith('/admin/attendees') %}is-active{% endif %}">
-      <span class="menu-icon" style="--icon-url: url('/static/images/sidebar/users.svg');" aria-hidden="true"></span>
-      <span class="menu-text">Attendees</span>
-    </a>
-  </li>
+<!--  <li class="menu-item">-->
+<!--    <a href="/admin/attendees" class="menu-link {% if request.path.startswith('/admin/attendees') %}is-active{% endif %}">-->
+<!--      <span class="menu-icon" style="&#45;&#45;icon-url: url('/static/images/sidebar/users.svg');" aria-hidden="true"></span>-->
+<!--      <span class="menu-text">Attendees</span>-->
+<!--    </a>-->
+<!--  </li>-->
 
   <li class="menu-item">
     <a href="/admin/finance" class="menu-link {% if request.path.startswith('/admin/finance') %}is-active{% endif %}">
@@ -111,7 +111,7 @@
 
 </ul>
             {% if user_active['role'] != 'viewer' %}
-            <button class="button" aria-label="Create event" onclick="window.location.href='{{ url_for('create_event') }}'">
+            <button class="button" aria-label="Create event" onclick="window.location.href='{{ url_for('events.create_event') }}'">
               <div class="plus"><img class="vector" src="/static/images/sidebar/plus.svg" alt="" /></div>
               <div class="frame-6"><span class="text-wrapper-2">Create event</span></div>
             </button>

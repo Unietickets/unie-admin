@@ -713,6 +713,14 @@ input:focus-visible {
 .ec-time-ok:active{ transform:translateY(1px); }
 /* светлый вариант кнопки, если хочешь как на скрине */
 .ec-time-ok.ec--yellow{
+    font-family: Instrument Sans;
+    font-weight: 600;
+    font-style: SemiBold;
+    font-size: 12px;
+    leading-trim: NONE;
+    line-height: 22px;
+    letter-spacing: 0%;
+    text-align: center;
     border-radius: 4px;
     angle: 0 deg;
     opacity: 1;
@@ -723,6 +731,140 @@ input:focus-visible {
     gap: 8px;
     background: #FFE35F;
     color: #000;
+}
+
+
+
+
+.ec-button-row-view{
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background:#F3F3F3;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+/* подсветка всей "таблетки" */
+.ec-button-row-view::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border:2px solid transparent;
+  border-radius:8px;
+  pointer-events:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+.ec-button-row-view:focus-within::after,
+.ec-button-row-view.is-active::after{
+  border: 2px solid var(--Colors-Primary-Yellow-primary300, #FFE35F);
+}
+
+/* убираем синюю обводку у нативных инпутов */
+.ec-text9:focus,
+.ec-text9:focus-visible{
+  outline:none;
+  box-shadow:none;
+}
+
+
+
+/* ВАЖНО: подсветка всего блока, когда фокус внутри */
+.ec-input-row:focus-within,
+.ec-input-row-2:focus-within {
+  border: 2px solid var(--Colors-Primary-Yellow-primary300, #FFE35F);
+}
+.et-input-row-2, .ss-wrap {
+    height: 43px;
+    /* height: 143%; */
+    /* overflow: visible; */
+}
+
+/* инпут — без собственной обводки, чтобы не спорил с контейнером */
+.ec-input-field {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+.ec-input-field:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+
+.ec-input-row.is-invalid,
+.ec-input-row-2.is-invalid {
+  box-shadow: inset 0 0 0 2px #EF4444;
+  background: #FFF;
+}
+
+.ec-ac-list {
+    width: 25%;
+    position: absolute;
+    left: 36%;
+    right: 0;
+    top: calc(72% + 6px);
+    background: #fff;
+    border: 1px solid #E4E4E7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .08), 0 3px 10px rgba(0, 0, 0, .1);
+    border-radius: 8px;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 5px 0;
+    display: none;
+}
+
+.ec-ac-item {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.ec-ac-item small {
+  color: #7A7A7A;
+  font-size: 13px;
+}
+
+.ec-ac-item:hover,
+.ec-ac-item.is-active {
+  background: #F2F2FF;
+}
+
+.ec-ac-empty {
+  padding: 12px 14px;
+  color: #7A7A7A;
+  font-size: 14px;
+}
+
+.ec-suggest {
+  position: absolute;
+  left: 0; right: 0; top: calc(100% + 6px);
+  background: #fff;
+  border: 1px solid #E4E4E7;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,.08), 0 3px 10px rgba(0,0,0,.1);
+  max-height: 260px;
+  overflow: auto;
+  z-index: 999;
+}
+
+.ec-suggest__item {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 14px;
+  line-height: 120%;
+}
+
+.ec-suggest__item:hover, .ec-suggest__item.is-active {
+  background: var(--colors-electric-violet-50, #F2F2FF);
 }
 /* Сжимаем «Previous/Next» на узких экранах */
 @media (max-width: 520px){

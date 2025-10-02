@@ -525,7 +525,7 @@ h1, h2, h3, h4,
 								/>
 								<input
 									type="text"
-									placeholder="Search by event name / order id /  customer name"
+									placeholder="Search by id / email"
 									class="search-input"
                                     id="search-event"
                                     value="{{ q if request.args.get('q') or request.args.get('page') }}"
@@ -597,7 +597,7 @@ h1, h2, h3, h4,
             {% for user in users_info %}
              {% if user_active['context_type'] == 'root' %}
             <tr>
-                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.id }}</td>
                     <td>{{ user.email }}<a href="mailto:{{ user.email }}" class="ms-2 text-decoration-none">
                         <i class="bi bi-envelope"></i>
                     </a></td>
@@ -619,7 +619,7 @@ h1, h2, h3, h4,
                                 <li>
                                     <a class="dropdown-item {{ 'text-danger' if user.status == 'Active'  else 'text-success' }}"
                                        href="#"
-                                       onclick="confirmBlock(event, '{{ url_for('edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
+                                       onclick="confirmBlock(event, '{{ url_for('admin_users_registrator.edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
                                         <i class="bi {{ 'bi-ban' if user.status == 'Active'  else 'bi-check-circle' }}"></i>
                                         {{ 'Ban' if user.status == 'Active' else 'Activate' }}
                                     </a>
@@ -630,7 +630,7 @@ h1, h2, h3, h4,
                 </tr>
             {% else %}
                 <tr>
-                    <td>{{ user.user_id }}</td>
+                    <td>{{ user.id }}</td>
                     <td>{{ user.email }}<a href="mailto:{{ user.email }}" class="ms-2 text-decoration-none">
                         <i class="bi bi-envelope"></i>
                     </a></td>
@@ -653,7 +653,7 @@ h1, h2, h3, h4,
                                 <li>
                                     <a class="dropdown-item {{ 'text-danger' if user.status != 'Banned'  else 'text-success' }}"
                                        href="#"
-                                       onclick="confirmBlock(event, '{{ url_for('edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
+                                       onclick="confirmBlock(event, '{{ url_for('admin_users_registrator.edit_status_admin_users', user_id=user.user_id, status=('false' if user.status  == 'Active' else 'true'), _external=True) }}')">
                                         <i class="bi {{ 'bi-ban' if user.status == 'Active'  else 'bi-check-circle' }}"></i>
                                         {{ 'Ban' if user.status == 'Active' else 'Activate' }}
                                     </a>

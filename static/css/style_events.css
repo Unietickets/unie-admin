@@ -11,7 +11,87 @@ body {
     padding-bottom: 48px;
     gap: 38px;
 }
+select.ec-input-field {
 
+        color: #989898;
+  border-radius: 12px;            /* как у инпута */
+  background: #f3f3f3;            /* как в макете */
+  font: 400 16px 'Instrument Sans', sans-serif;
+  line-height: 1.2;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease, background .15s;
+}
+
+/*select.ec-input-field:focus {*/
+/*  border-color: #7c7cff;          !* твой цвет фокуса *!*/
+/*  box-shadow: 0 0 0 3px rgba(124,124,255,.15);*/
+/*  background: #fff;*/
+.et-select {
+        display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+    padding: 14px 16px; gap: 10px; width: 175px; height: 47px; background: #F3F3F3; border-radius: 8px;
+}
+
+.et-select-city {
+        display: flex; flex-direction: row; justify-content: space-between; align-items: center;
+     gap: 10px; width: 175px; height: 47px; background: #F3F3F3; border-radius: 8px;
+}
+
+.ss-wrap { position: relative; width: 100%; }
+
+/* поле поиска/отображения */
+.ss-input.ec-input-field {
+  appearance: none;
+  padding-right: 40px; /* под стрелку */
+  width: 100%;
+}
+
+
+.ss-list.open { display: block; }
+
+.ss-option {
+  padding: 10px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ss-option:hover, .ss-option[aria-selected="true"] {
+  background: #f3f3ff;
+}
+
+.ss-arrow {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 18px; height: 18px; opacity: .7;
+}
+
+/* прячем оригинальный select, но оставляем в форме */
+.ss-hidden { position: absolute !important; inset: 0 !important; opacity: 0 !important; pointer-events: none !important; }
+
+
+
+.ss-wrap { position: relative; }
+
+/* сам список — ПОД полем */
+.ss-list{
+  position: absolute;
+  top: calc(100% + 6px);   /* ← ключевое: ниже инпута */
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  max-height: 240px;
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  display: none;
+}
+.ss-list.open { display:block; }
+
+/* чтобы серый контейнер не обрезал дропдаун */
+.et-input-row-2, .ss-wrap { overflow: visible; }
 .column6 {
     align-self: stretch;
     display: flex;
@@ -945,7 +1025,7 @@ textarea:focus, input:focus {
   .ep-row-view13 { align-self:stretch; display:flex; align-items:flex-start; gap:4px; }
   .ep-row-view14 { align-self:stretch; display:flex; align-items:center; margin-bottom:16px; }
   .ep-row-view15 { display:flex; align-items:flex-start; gap:16px; }
-  .ep-row-view16 { display:flex; align-items:center; background:#F2F2FF; border-radius:8px; padding:16px; gap:24px; }
+  .ep-row-view16 { display:flex; align-items:center; background:#EFEFEF; border-radius:8px; padding:16px; gap:24px; }
 
   .ep-scroll-view { height:816px; align-self:stretch; background:#FFFFFF; }
 
@@ -958,11 +1038,11 @@ textarea:focus, input:focus {
   .ep-text6 { width:160px; height:24px; font-family:'Instrument Sans',serif; font-weight:500; font-size:14px; line-height:150%; color:rgba(0,0,0,0.4); }
   .ep-text6_rev { width:144px; height:24px; font-family:'Instrument Sans',serif; font-weight:500; font-size:14px; line-height:150%; color:rgba(0,0,0,0.4); }
   .ep-text_6 { font-family:'Instrument Sans',serif; font-weight:500; font-size:14px; line-height:150%; }
-  .ep-text7 { color:#6D4DFF; font-size:16px; font-weight:bold; }
+  .ep-text7 { color:black; font-size:16px; font-weight:bold; }
   .ep-draft { color:#000000; font-size:16px; font-weight:bold; }
   .ep-text8 { color:#000000; font-size:16px; font-weight:bold; margin-right:14px; }
   .ep-text9 { color:#000000; font-size:16px; font-weight:bold; }
-  .ep-text9_modal { font-weight:bold; color:#6D4DFF; font-size:16px; flex:1; }
+  .ep-text9_modal { font-weight:bold; color:black; font-size:16px; flex:1; }
   .ep-text10 { color:#000000; font-size:32px; font-weight:bold; margin-bottom:16px; }
   .ep-text11 { color:#000000; font-size:16px; margin-bottom:1px; }
   .ep-text12 { color:#000000; font-size:20px; font-weight:bold; }
@@ -1011,8 +1091,8 @@ textarea:focus, input:focus {
   .ep-genre-options-list.open { display:block; }
 
   .ep-genre-option { margin:8px; padding:13px 24px; cursor:pointer; font-size:16px; color:#232323; transition:background 0.15s; }
-  .ep-genre-option:hover, .ep-genre-option.selected { background:#F3F0FF; color:black; }
-  .ep-genre-option.disabled { margin:8px; background:#F2F2FF; color:black; }
+  .ep-genre-option:hover, .ep-genre-option.selected { background:#EFEFEF; color:black; }
+  .ep-genre-option.disabled { margin:8px; background:#EFEFEF; color:black; }
 
   /* наши кнопки (без конфликтов с Bootstrap .btn) */
   .ep-btn {

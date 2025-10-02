@@ -151,7 +151,7 @@
 
                   <div id="genre-dropdown" class="et-genre-dropdown">
                     {% for genre in genre_all_list %}
-                    <div class="et-genre-option" onclick="selectGenre('{{ genre }}')">{{ genre }}</div>
+                    <div class="et-genre-option" data-value="{{ genre.id }}" onclick="selectGenre('{{ genre.id }}')">{{ genre.name }}</div>
                     {% endfor %}
                   </div>
                 </div>
@@ -174,6 +174,13 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    function getOptionValue(el) {
+  // берём data-value, иначе value, иначе текст как fallback
+  return el.dataset.value ?? el.getAttribute('value') ?? el.textContent.trim();
+}
+function getOptionLabel(el) {
+  return el.dataset.label ?? el.textContent.trim();
+}
   const genreDropdown = document.getElementById("genre-dropdown");
   const genreTags = document.getElementById("genre-tags");
   const genrePlaceholder = document.getElementById("genre-placeholder");
@@ -182,14 +189,15 @@
   function toggleGenreDropdown() {
     // При каждом открытии обновляем дизейблы
     document.querySelectorAll('.et-genre-option').forEach(option => {
-      if (selectedGenres.includes(option.textContent.trim())) {
+        const val = getOptionValue(option);
+      if (selectedGenres.includes(val)) {
         option.classList.add('disabled');
         option.onclick = null;
       } else {
         option.classList.remove('disabled');
         option.onclick = function(e) {
           e.stopPropagation();
-          selectGenre(option.textContent.trim());
+          selectGenre(val);
         };
       }
     });
@@ -204,6 +212,7 @@
   function selectGenre(genre) {
     if (!selectedGenres.includes(genre)) {
       selectedGenres.push(genre);
+
       renderSelectedGenres();
     }
     genreDropdown.style.display = "none";
@@ -212,10 +221,13 @@
 
   function renderSelectedGenres() {
     genreTags.innerHTML = "";
+
     selectedGenres.forEach(g => {
+        const option = document.querySelector(`.et-genre-option[data-value="${CSS.escape(g)}"]`);
+    const label = option ? getOptionLabel(option) : g;
       const tag = document.createElement("span");
       tag.className = "et-tag";
-      tag.textContent = g;
+      tag.textContent = label;
 
       const remove = document.createElement("span");
       remove.role = 'button';
@@ -243,14 +255,15 @@
     input.value = selectedGenres.join(",");
     // Синхронизируем дизейблы после изменений
     document.querySelectorAll('.et-genre-option').forEach(option => {
-      if (selectedGenres.includes(option.textContent.trim())) {
+         const val = getOptionValue(option);
+      if (selectedGenres.includes(val)) {
         option.classList.add('disabled');
         option.onclick = null;
       } else {
         option.classList.remove('disabled');
         option.onclick = function(e) {
           e.stopPropagation();
-          selectGenre(option.textContent.trim());
+          selectGenre(val);
         };
       }
     });

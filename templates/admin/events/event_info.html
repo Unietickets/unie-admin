@@ -21,7 +21,7 @@
 <div id="genre-modal" class="ep-modal_event" style="display:none;"
      data-all-genres='{{ genre_all_list|tojson }}'
      data-event-id="{{ event.id }}"
-     data-selected-genres='{{ event.genre|tojson }}'>
+     data-selected-genres='{{ event_genres|tojson }}'>
   <div class="ep-modal-content-event">
     <span class="ep-close_event" onclick="closeGenreModal()">&times;</span>
 
@@ -48,8 +48,8 @@
     </div>
 
     <div style="display:flex; gap:16px; justify-content:flex-end; margin-top:32px; margin-left:70%;">
-      <button onclick="closeGenreModal()" class="ep-btn ep-btn-outline">Cancel</button>
-      <button onclick="saveGenreSelection()" class="ep-btn ep-btn-primary">Save</button>
+      <button onclick="closeGenreModal()" class="btn btn-accent">Cancel</button>
+      <button onclick="saveGenreSelection()" class="btn button-publish">Save</button>
     </div>
   </div>
 </div>
@@ -71,7 +71,7 @@
           <span style="font-family:'Instrument Sans'; font-weight:600; font-size:16px;">Start date</span>
           <div style="display:flex; align-items:center; background:#F3F3F3; border-radius:8px; height:47px; padding:14px 16px;">
             <input class="ep-text9_modal" id="start-date" name="start_date" type="date" placeholder="Select date"
-                   value="{{ event.event_date.strftime('%Y-%m-%d') }}"
+                   value="{{ event.date_start.strftime('%Y-%m-%d') }}"
                    style="flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"/>
             <img src="/static/images/sidebar/CalendarBlank.svg" class="ep-input-calendar" alt="calendar"
                  onclick="document.getElementById('start-date').showPicker && document.getElementById('start-date').showPicker()"
@@ -83,15 +83,15 @@
           <span style="font-family:'Instrument Sans'; font-weight:600; font-size:16px;">End date</span>
           <div style="display:flex; align-items:center; background:#F3F3F3; border-radius:8px; height:47px; padding:14px 16px; position:relative;">
             <input class="ep-text9_modal" id="end-date" name="end_date" type="date" placeholder="Select date"
-                   value="{{ event.event_date_end.strftime('%Y-%m-%d') }}"
+                   value="{{ event.date_end.strftime('%Y-%m-%d') }}"
                    style="flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"/>
             <img src="/static/images/sidebar/CalendarBlank.svg" class="ep-input-calendar" alt="calendar"
                  onclick="document.getElementById('end-date').showPicker && document.getElementById('end-date').showPicker()"
                  style="cursor:pointer; margin-left:-32px;"/>
             <div style="position:absolute; right:-57px; top:132%; display:flex; align-items:center; width:201px; height:15px;
-                        font-family:'Raleway'; font-weight:600; font-size:6px; line-height:6px; color:#5C4BD3;">
-              <input type="checkbox" id="end-same-as-start" style="accent-color:#6D4DFF;">
-              <label for="end-same-as-start" style="font-family:'Raleway'; font-weight:600; font-size:12px; color:#6D4DFF; margin-left:8px; cursor:pointer;">
+                        font-family:'Raleway'; font-weight:600; font-size:6px; line-height:6px; color:black;">
+              <input type="checkbox" id="end-same-as-start" style="accent-color:black;">
+              <label for="end-same-as-start" style="font-family:'Raleway'; font-weight:600; font-size:12px; color:black; margin-left:8px; cursor:pointer;">
                 Same as a start date
               </label>
             </div>
@@ -105,7 +105,7 @@
           <span style="font-family:'Instrument Sans'; font-weight:600; font-size:16px;">Start time</span>
           <div style="display:flex; align-items:center; background:#F3F3F3; border-radius:8px; height:47px; padding:14px 16px;">
             <input class="ep-text9_modal" id="start-time" name="start_time" type="time" placeholder="Select time"
-                   value="{{ event.event_date.strftime('%H:%M') }}"
+                   value="{{ event.date_start.strftime('%H:%M') }}"
                    style="flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"/>
             <img src="/static/images/sidebar/CalendarBlank.svg" class="ep-input-calendar" alt="clock"
                  onclick="document.getElementById('start-time').showPicker && document.getElementById('start-time').showPicker()"
@@ -117,7 +117,7 @@
           <span style="font-family:'Instrument Sans'; font-weight:600; font-size:16px;">End time</span>
           <div style="display:flex; align-items:center; background:#F3F3F3; border-radius:8px; height:47px; padding:14px 16px;">
             <input class="ep-text9_modal" id="end-time" name="end_time" type="time" placeholder="Select time"
-                   value="{{ event.event_date_end.strftime('%H:%M') }}"
+                   value="{{ event.date_end.strftime('%H:%M') }}"
                    style="flex:1; background:#f3f3f3; border:none; border-radius:8px; font-size:16px;"/>
             <img src="/static/images/sidebar/CalendarBlank.svg" class="ep-input-calendar" alt="clock"
                  onclick="document.getElementById('end-time').showPicker && document.getElementById('end-time').showPicker()"
@@ -129,12 +129,12 @@
     </div>
 
     <div style="display:flex; flex-direction:row; gap:12px; margin-left:auto;">
-      <button onclick="closeDateModal()"
-              style="box-sizing:border-box; border:2px solid #D4D2FF; border-radius:8px; width:85px; height:46px; background:none; color:#6D4DFF; font-family:'Instrument Sans'; font-weight:600; font-size:16px; cursor:pointer;">
+      <button class="btn btn-accent" onclick="closeDateModal()"
+             >
         Cancel
       </button>
-      <button onclick="saveDates()"
-              style="background:#6D4DFF; border-radius:8px; width:69px; height:46px; color:#fff; font-family:'Instrument Sans'; font-weight:600; font-size:16px; border:none; cursor:pointer;">
+      <button class="btn button-publish" onclick="saveDates()"
+              >
         Save
       </button>
     </div>
@@ -191,12 +191,12 @@
 
           <div class="ep-column6">
             <div class="ep-row-view13">
-              {% for genre in event.genre %}
+              {% for genre in event_genres %}
               <div class="ep-button-row-view">
-                <span class="ep-text_6">{{ genre }}</span>
-                <form action="/admin/genre/edit/{{ event.id }}/{{ genre }}/delete" method="POST" style="display:inline;">
+                <span class="ep-text_6">{{ genre.name }}</span>
+                <form action="/admin/genre/edit/{{ event.id }}/{{ genre.id }}/delete" method="POST" style="display:inline;">
                   <input type="hidden" name="event_id" value="{{ event.id }}">
-                  <input type="hidden" name="genre_value" value="{{ genre }}">
+                  <input type="hidden" name="genre_value" value="{{ genre.id }}">
                   <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
                     <img src="/static/images/X.svg" alt="Delete"/>
                   </button>
@@ -204,7 +204,7 @@
               </div>
               {% endfor %}
               <button onclick="openGenreModal()" style="background:none; border:none; padding:0; cursor:pointer;">
-                <img src="/static/images/plus.svg" alt="Add"/>
+                <img src="/static/images/add.svg" alt="Add"/>
               </button>
             </div>
 
@@ -214,14 +214,14 @@
                   <span class="ep-text8">{{ date_format }}</span>
                 </button>
                 <img src="/static/images/ellipse.svg" class="ep-image9"/>
-                <span class="ep-text9">{{ event.location }}, {{ event.location_address }}, {{ event.city }}</span>
+                <span class="ep-text9">{{ event.location }}, {{ event.address }}, {{ city_name }}</span>
               </div>
 
               <span class="ep-text10">{{ event.name }}</span>
               <span class="ep-text11">{{ event.description }}</span>
             </div>
 
-            <span class="ep-text12">{{ event.price_tickets }} czk</span>
+            <span class="ep-text12">{{ event.tickets_prices }} czk</span>
           </div>
         </div>
 
@@ -237,7 +237,7 @@
                 </div>
                 <div class="ep-column11">
                   <span class="ep-text6">Price:</span>
-                  <span class="ep-text14">{{ event.price_tickets }} czk</span>
+                  <span class="ep-text14">{{ event.tickets_prices }} czk</span>
                 </div>
               </div>
 
@@ -266,7 +266,7 @@
               </div>
             </div>
 
-            <button class="ep-button4" onclick="alert('Pressed!')">
+            <button class="ep-button4 button-publish" onclick="alert('Pressed!')">
               <span class="ep-text7">View Report</span>
             </button>
           </div>
@@ -330,14 +330,19 @@
 </script>
 <script>
   const genreModal = document.getElementById("genre-modal");
-  const allGenres = JSON.parse(genreModal.dataset.allGenres);
-  let selectedGenres = JSON.parse(genreModal.dataset.selectedGenres);
-  let modalGenres = [...selectedGenres];
+
+  /** ожидается формат в data-*:
+   *  data-all-genres='[{"id":1,"name":"Techno"}, ...]'
+   *  data-selected-genres='[{"id":1,"name":"Techno"}]'
+   */
+  const allGenres = JSON.parse(genreModal.dataset.allGenres || "[]");           // [{id,name}]
+  let selectedGenres = JSON.parse(genreModal.dataset.selectedGenres || "[]");   // [{id,name}]
+  let modalGenres = selectedGenres.map(g => ({ id: String(g.id), name: g.name }));
   let genreDropdownOpen = false;
 
   function openGenreModal() {
     document.getElementById('genre-modal').style.display = "flex";
-    modalGenres = [...selectedGenres];
+    modalGenres = selectedGenres.map(g => ({ id: String(g.id), name: g.name }));
     document.getElementById('genre-search').value = '';
     renderModalTags();
     renderGenreOptions();
@@ -373,8 +378,8 @@
     genreDropdownOpen ? closeGenreDropdown() : openGenreDropdown();
   }
 
-  // click outside closes
-  document.addEventListener('mousedown', function (e) {
+  // click outside
+  document.addEventListener('mousedown', (e) => {
     if (genreDropdownOpen &&
         !e.target.closest('.ep-genre-select-block') &&
         !e.target.closest('#genre-options-list')) {
@@ -384,74 +389,103 @@
 
   // open on focus
   document.getElementById('genre-search').addEventListener('focus', openGenreDropdown);
-  // toggle by arrow
   const arrowEl = document.querySelector('.ep-dropdown-icon');
   if (arrowEl) {
-    arrowEl.addEventListener('mousedown', function (e) {
+    arrowEl.addEventListener('mousedown', (e) => {
       e.preventDefault();
       toggleGenreDropdown();
     });
   }
 
+  // utils
+  const idSet = (arr) => new Set(arr.map(g => String(g.id)));
+  const hasId = (set, id) => set.has(String(id));
+
   // render tags
   function renderModalTags() {
     const cont = document.getElementById('modal-genre-tags');
-    const btn = document.createElement('button');
-    btn.id = "toggle-search-btn";
-    btn.style.background = "none";
-    btn.style.border = "none";
-    btn.style.cursor = "pointer";
-    btn.onclick = toggleGenreSearch;
-
-    const img = document.createElement('img');
-    img.src = "/static/images/down.svg";
-    img.className = "ep-search-icon";
-    img.alt = "search";
-    img.width = 22;
-    img.height = 22;
-
     cont.innerHTML = "";
+
     modalGenres.forEach(g => {
       const tag = document.createElement('span');
       tag.className = "ep-genre-tag";
-      tag.innerHTML = g + '<span class="ep-tag-close" onclick="removeGenreFromModal(\'' + g + '\')">&times;</span>';
+      tag.textContent = g.name;
+
+      const close = document.createElement('span');
+      close.className = "ep-tag-close";
+      close.setAttribute('role', 'button');
+      close.innerHTML = "&times;";
+      close.onclick = (e) => {
+        e.stopPropagation();
+        removeGenreFromModal(g.id);
+      };
+
+      tag.appendChild(close);
       cont.appendChild(tag);
     });
-    btn.appendChild(img);
-    cont.appendChild(btn);
+
+    // кнопка показать поиск
+    let btn = document.getElementById("toggle-search-btn");
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = "toggle-search-btn";
+      btn.type = "button";
+      btn.style.background = "none";
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+      btn.onclick = toggleGenreSearch;
+
+      const img = document.createElement('img');
+      img.src = "/static/images/down.svg";
+      img.className = "ep-search-icon";
+      img.alt = "search";
+      img.width = 22; img.height = 22;
+      btn.appendChild(img);
+      cont.appendChild(btn);
+    } else {
+      cont.appendChild(btn);
+    }
   }
 
-  function removeGenreFromModal(g) {
-    modalGenres = modalGenres.filter(x => x !== g);
+  function removeGenreFromModal(id) {
+    modalGenres = modalGenres.filter(x => String(x.id) !== String(id));
     renderModalTags();
     renderGenreOptions();
   }
 
-  // render options
+  // render options (всё на объектах)
   function renderGenreOptions() {
     const list = document.getElementById('genre-options-list');
-    const search = document.getElementById('genre-search').value.toLowerCase();
+    const search = (document.getElementById('genre-search').value || "").toLowerCase().trim();
     list.innerHTML = "";
-    let hasAny = false;
+    let any = false;
 
-    allGenres.filter(g => g.toLowerCase().includes(search)).forEach(g => {
-      const div = document.createElement('div');
-      div.className = "ep-genre-option" + (modalGenres.includes(g) ? " disabled" : "");
-      div.textContent = g;
-      if (!modalGenres.includes(g)) {
-        div.onclick = () => {
-          modalGenres.push(g);
-          renderModalTags();
-          renderGenreOptions();
-          document.getElementById('genre-search').value = '';
-          document.getElementById('genre-search').focus();
-        };
-      }
-      list.appendChild(div);
-      hasAny = true;
-    });
+    const selectedIds = idSet(modalGenres);
 
-    if (!hasAny) {
+    // фильтруем по имени
+    allGenres
+      .filter(g => g.name.toLowerCase().includes(search))
+      .forEach(g => {
+        const disabled = hasId(selectedIds, g.id);
+        const div = document.createElement('div');
+        div.className = "ep-genre-option" + (disabled ? " disabled" : "");
+        div.textContent = g.name;
+
+        if (!disabled) {
+          div.onclick = () => {
+            modalGenres.push({ id: String(g.id), name: g.name });
+            renderModalTags();
+            renderGenreOptions();
+            const input = document.getElementById('genre-search');
+            input.value = '';
+            input.focus();
+          };
+        }
+        list.appendChild(div);
+        any = true;
+      });
+
+    if (!any) {
       const empty = document.createElement('div');
       empty.className = "ep-genre-option disabled";
       empty.textContent = "No results";
@@ -462,40 +496,27 @@
   function filterGenreList() { renderGenreOptions(); }
 
   function saveGenreSelection() {
-    selectedGenres = [...modalGenres];
+    // пересохраняем выбранные
+    selectedGenres = modalGenres.map(g => ({ id: String(g.id), name: g.name }));
     closeGenreModal();
-    const eventId = document.getElementById('genre-modal').dataset.eventId;
+
+    const eventId = genreModal.dataset.eventId;
+    const genreIds = selectedGenres.map(g => String(g.id)); // отправляем ID
+
     fetch(`/admin/genre/edit/${eventId}/bulk/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ genres: selectedGenres })
+      body: JSON.stringify({ genres: genreIds })
     })
-      .then(r => r.json()).then(() => { location.reload(); })
-      .catch(() => {});
-    location.reload();
-  }
-
-  function saveDates() {
-    closeDateModal();
-    const start_date = document.getElementById('start-date').value;
-    const end_date = document.getElementById('end-date').value;
-    const start_time = document.getElementById('start-time').value;
-    const end_time = document.getElementById('end-time').value;
-    const eventId = document.getElementById('date-modal').dataset.eventId;
-
-    fetch(`/admin/event/edit/${eventId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ start_date, end_date, start_time, end_time })
-    })
-      .then(r => r.json()).then(() => { location.reload(); })
-      .catch(() => {});
-    location.reload();
+    .then(r => r.ok ? r.json() : null)
+    .then(() => { location.reload(); })
+    .catch(() => { location.reload(); });
   }
 
   function toggleGenreSearch() {
     const trigger = document.getElementById('genre-input-trigger');
-    if (trigger.style.display === 'none' || !trigger.style.display) {
+    const shown = getComputedStyle(trigger).display !== 'none';
+    if (!shown) {
       trigger.style.display = 'flex';
       document.getElementById('genre-search').focus();
     } else {
@@ -503,6 +524,34 @@
       document.getElementById('genre-search').value = '';
       filterGenreList();
     }
+  }
+  async function saveDates() {
+    closeDateModal();
+    const start_date = document.getElementById('start-date').value;
+    const end_date = document.getElementById('end-date').value;
+    const start_time = document.getElementById('start-time').value;
+    const end_time = document.getElementById('end-time').value;
+    const eventId = document.getElementById('date-modal').dataset.eventId;
+
+    try {
+    const res = await fetch(`/admin/event/edit/${eventId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',              // если нужна сессионная кука/CSRF
+      body: JSON.stringify({ start_date, end_date, start_time, end_time })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    // Если бэкенд возвращает JSON — подождём его; если 204 — этот await просто упадёт, поэтому ловим
+    try { await res.json(); } catch (_) {}
+
+    // теперь точно можно перезагружать
+    location.reload();
+  } catch (e) {
+    console.error('Save dates failed:', e);
+    // покажи тост/алерт, но не перезагружай
+  }
   }
 </script>
 

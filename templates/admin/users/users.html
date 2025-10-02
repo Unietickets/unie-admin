@@ -613,7 +613,7 @@
                     />
                     <input
                             type="text"
-                            placeholder="Search by event name / order id /  customer name"
+                            placeholder="Search by name / id / email / phone"
                             class="search-input"
                             id="search-event"
                             value="{{ q if request.args.get('q') or request.args.get('page') }}"
@@ -704,16 +704,10 @@
                                     <li>
                                         <a class="dropdown-item {{ 'text-danger' if user.is_active else 'text-success' }}"
                                            href="#"
-                                           onclick="confirmBlock(event, '{{ url_for('edit_status', user_id=user.id, status=('false' if user.is_active else 'true'), _external=True) }}')">
+                                           onclick="confirmBlock(event, '{{ url_for('client.edit_status', user_id=user.id, status=('false' if user.is_active else 'true'), _external=True) }}')">
                                             <i class="bi {{ 'bi-ban' if user.is_active else 'bi-check-circle' }}"></i>
                                             {{ 'Ban' if user.is_active else 'Activate' }}
                                         </a>
-                                    </li>
-                                    <li>
-                                        {# <a class="dropdown-item text-danger" href="#"
-                                              onclick="confirmDeletion(event, '{{ url_for('admin_users', customer_id=user.id, _external=True) }}')">#}
-                                        {# <i class="bi bi-trash"></i> Удалить#}
-                                        {# </a>#}
                                     </li>
                                 </ul>
                             </div>
